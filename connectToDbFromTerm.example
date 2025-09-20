@@ -1,0 +1,2 @@
+docker exec -it image-viewer-db psql -U postgres
+

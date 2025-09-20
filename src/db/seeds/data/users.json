@@ -1,0 +1,27 @@
+[
+    {
+        "username": "johnusername",
+        "email": "johnemail@gmail.com",
+        "password": "john",
+        "displayName": "John Smith",
+        "role": "Admin"
+    },
+    {
+        "username": "janedoe",
+        "email": "jane@gmail.com",
+        "password": "jane",
+        "displayName": "Jane Doe"
+    },
+    {
+        "username": "michaeljones",
+        "email": "michael@gmail.com",
+        "password": "michael",
+        "displayName": "Michael The Best"
+    },
+    {
+        "username": "sarah",
+        "email": "sarah@gmail.com",
+        "password": "sarah",
+        "displayName": "Sarah's Audio Nook"
+    }
+]

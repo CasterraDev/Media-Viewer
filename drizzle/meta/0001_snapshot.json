@@ -1,0 +1,122 @@
+{
+  "id": "662af97f-7844-4192-83ce-4b82b81ffc86",
+  "prevId": "04a6a0dc-f8f2-4dd6-a6a8-7ec938027877",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.Media": {
+      "name": "Media",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "title": {
+          "name": "title",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "description": {
+          "name": "description",
+          "type": "varchar(5000)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "mediaType": {
+          "name": "mediaType",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "mediaRoot": {
+          "name": "mediaRoot",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "mediaDir": {
+          "name": "mediaDir",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "mediaFilename": {
+          "name": "mediaFilename",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "mediaSize": {
+          "name": "mediaSize",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "media_created_at": {
+          "name": "media_created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "media_updated_at": {
+          "name": "media_updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "media_title_idx": {
+          "name": "media_title_idx",
+          "columns": [
+            {
+              "expression": "title",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}
