@@ -22,13 +22,12 @@ export const media = pgTable("Media", {
     createdAt: timestamp("created_at", { mode: "string" }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { mode: "string" }).notNull().defaultNow().$onUpdate(() => new Date().toString()).notNull()
 },
-
     (table) => ([
         index("media_title_idx").on(table.title),
     ])
 );
 
 export const schema = {
-    media
+    media,
 }
 

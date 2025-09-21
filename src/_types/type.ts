@@ -6,3 +6,8 @@ type MediaJsonRes = {
     mediaType: string
     stats: string
 }
+
+export type UserPrefs = {
+  sortType: string,
+  mediaRoots: string[]
+}

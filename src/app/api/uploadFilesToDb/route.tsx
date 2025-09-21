@@ -62,10 +62,13 @@ export async function POST(
 ) {
     try {
         const body = await req.json()
-        const mediaRoot: string | null = body.mediaRoot;
-        if (!mediaRoot) throw new Error("Variable not found");
+        const mediaRoots: string[] | null = body.mediaRoots;
+        if (!mediaRoots) throw new Error("No media roots passed.")
 
-        await uploadFiles(mediaRoot, mediaRoot);
+        mediaRoots.map(async (m) => {
+            await uploadFiles(m, m);
+        })
+
 
         return new Response('Finished Uploading', { status: 200 });
     } catch (err: unknown) {
