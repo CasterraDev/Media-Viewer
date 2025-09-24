@@ -1,5 +1,6 @@
 "use client"
 import { Media } from "@/db/types";
+import Image from "next/image";
 import { ReactNode, useEffect, useState } from "react"
 
 type MediaShowType = {
@@ -12,9 +13,14 @@ export default function MediaShow(props: MediaShowType) {
     const dynaMedia = (): ReactNode => {
         if (!media) return;
         if (media.mediaType.includes("image")) {
-            return <img
-                src={`/api/getMedia?mediaID=${media.id}`}
-            />
+            return (
+                <div className="relative">
+                    <Image
+                        alt={`${media.title || media.mediaFilename}`}
+                        src={`/api/getMedia?mediaID=${media.id}`}
+                    />
+                </div>
+            )
         } else {
             return <video
                 controls
@@ -24,7 +30,7 @@ export default function MediaShow(props: MediaShowType) {
     }
 
     return (
-        <div>
+        <div className="w-full h-full">
             {
                 dynaMedia()
             }
