@@ -15,7 +15,7 @@ export default function MediaShow(props: MediaShowType) {
         if (media.mediaType.includes("image")) {
             return (
                 <div className="relative">
-                    <Image
+                    <img
                         alt={`${media.title || media.mediaFilename}`}
                         src={`/api/getMedia?mediaID=${media.id}`}
                     />
