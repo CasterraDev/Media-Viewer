@@ -6,15 +6,9 @@ import { stat } from 'fs/promises';
 import { NextRequest, NextResponse } from 'next/server';
 import path from 'path';
 var mime = require("mime-types");
-
-const getType = (mimeType: string): string => {
-    if (mimeType.includes("image")) {
-        return "photos"
-    } else if (mimeType.includes("mp4")) {
-        return "videos"
-    }
-    return "photos"
-}
+import { imageSizeFromFile } from 'image-size/fromFile'
+import { getType, getVideoData } from '@/utils/util';
+import { MediaType } from '@/_types/type';
 
 const uploadFiles = async (filepath: string, mediaRoot: string): Promise<number> => {
     return new Promise((resolve, _reject) => {
@@ -53,18 +47,35 @@ const uploadFiles = async (filepath: string, mediaRoot: string): Promise<number>
                 const mimeType: string = mime.lookup(file)
 
                 const type = getType(mimeType)
+                let width = 0, height = 0, duration: number | null = null;
+
+                if (type == MediaType.videos){
+                    const videoData = await getVideoData(filename);
+                    width = videoData.width
+                    height = videoData.height
+                    duration = videoData.durationInSecs
+                }else {
+                    const dimensions = await imageSizeFromFile(filename)
+                    width = dimensions.width
+                    height = dimensions.height
+                }
 
                 const m: typeof schema.media.$inferInsert = {
                     mediaFilename: name,
                     mediaDir: dir,
                     mediaRoot: root,
                     mediaFilePath: root + dir + name,
-                    mediaType: type,
+                    mediaType: MediaType[type],
                     mediaMime: mimeType,
+                    mediaWidth: width,
+                    mediaHeight: height,
                     mediaSize: stats.size.toString(),
                     mediaCreatedAt: stats.birthtime.toISOString(),
                     mediaUpdatedAt: stats.mtime.toISOString(),
                 };
+                if (duration){
+                    m.mediaDurationInSecs = duration;
+                }
 
                 await db.insert(media).values(m)
             }

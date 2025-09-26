@@ -22,6 +22,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "drizzle-orm": "^0.44.5",
+    "image-size": "^2.0.2",
     "lucide-react": "^0.544.0",
     "mime-types": "^3.0.1",
     "next": "15.5.3",

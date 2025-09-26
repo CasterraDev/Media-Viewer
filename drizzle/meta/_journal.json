@@ -43,6 +43,20 @@
       "when": 1758781871565,
       "tag": "0005_workable_shinko_yamashiro",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1758873855066,
+      "tag": "0006_fresh_harrier",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1758913162902,
+      "tag": "0007_clammy_tarot",
+      "breakpoints": true
     }
   ]
 }

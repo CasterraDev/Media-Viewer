@@ -1,4 +1,17 @@
+import { MediaType } from "@/_types/type";
+import { exec } from "child_process";
 import { createReadStream, ReadStream } from "fs";
+var assert = require('assert');
+
+export const getType = (mimeType: string): MediaType => {
+    if (mimeType.includes("image")) {
+        return MediaType.photos
+    } else if (mimeType.includes("mp4")) {
+        return MediaType.videos
+    }
+    return MediaType.photos
+}
+
 
 // convert image to object part instead of base64 for better performance
 // https://developer.mozilla.org/en-US/docs/Web/API/URL/createObjectURL
@@ -15,6 +28,31 @@ import { createReadStream, ReadStream } from "fs";
 //         }, 100);
 //     });
 // }
+
+export const getVideoData = (filename: string): Promise<{ width: number, height: number, durationInSecs: number }> => {
+    return new Promise((resolve, _reject) => {
+        exec(`ffprobe -v error -of flat=s=_ -select_streams v:0 -show_entries stream=height,width,duration ${filename}`, (error, stdout, stderr) => {
+            if (error || stderr){
+                _reject("Error occured")
+            }
+            console.log(stdout)
+            var width = /width=(\d+)/.exec(stdout);
+            var height = /height=(\d+)/.exec(stdout);
+            var duration = /duration="([\d\.]+)"/.exec(stdout);
+            var d = /duration="(\d+)"/
+            console.log(duration)
+            assert(width && height, 'No dimensions found!');
+            if (width == null || height == null || !duration) {
+                _reject("Error occured")
+            }
+            resolve({
+                width: parseInt((width as any)[1]),
+                height: parseInt((height as any)[1]),
+                durationInSecs: parseInt((duration as any)[1])
+            })
+        });
+    });
+}
 
 export const getVideoDuration = (video: HTMLVideoElement): Promise<number> => {
     return new Promise((resolve, reject) => {

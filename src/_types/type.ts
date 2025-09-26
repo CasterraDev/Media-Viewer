@@ -1,12 +1,23 @@
 import { Signal } from "@preact/signals-react"
 
-type MediaJsonRes = {
+export type MediaJsonRes = {
     mediaRoot: string
     mediaDir: string
     mediaFile: string
     mediaPath: string
     mediaType: string
     stats: string
+}
+
+export enum MediaSizing {
+    'square',
+    'landscape',
+    'portrait'
+}
+
+export enum MediaType {
+    'photos',
+    'videos'
 }
 
 export type UserPrefs = {
