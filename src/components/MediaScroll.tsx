@@ -33,18 +33,18 @@ export default function MediaScroll() {
     }, [inView])
 
     return (
-        <div>
-            <div className="grid grid-cols-4">
+        <div className="w-full h-fit">
+            <div className="grid grid-cols-4 w-full h-fit">
                 <Suspense>
                 {mediaList.value.map((m) => (
                     <div key={m.id}>
-                        <MediaShow media={m} />
+                        <MediaShow media={m} dimensionType="portrait"/>
                     </div>
                 ))}
                 </Suspense>
             </div>
             <Show when={mediaNotFinished}>
-                <div className="flex justify-center">
+                <div className="flex justify-center mt-100">
                     <div ref={ref} className="p-5 border-1 rounded-lg">Loading...</div>
                 </div>
             </Show>
