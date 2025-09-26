@@ -1,13 +1,14 @@
 import { db } from '@/db';
 import { media } from '@/db/schema';
-import { and, asc, desc, gt, ilike, lt } from 'drizzle-orm';
+import { and, asc, desc, gt, ilike, inArray, lt } from 'drizzle-orm';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(
     req: NextRequest,
 ) {
     try {
-        const mediaType = req.nextUrl.searchParams.get("mediaType");
+        const mediaTypesParam = req.nextUrl.searchParams.getAll("mediaTypes");
+        console.log(mediaTypesParam)
         const beforeDate = req.nextUrl.searchParams.get("beforeDate");
         const afterDate = req.nextUrl.searchParams.get("afterDate");
         const sorting = req.nextUrl.searchParams.get("sorting");
@@ -15,7 +16,7 @@ export async function GET(
         const offset = req.nextUrl.searchParams.get("offset");
 
         const medias = await db.select().from(media).orderBy(sorting?.match("descending") ? desc(media.mediaCreatedAt) : asc(media.mediaCreatedAt)).where(and(
-            mediaType ? ilike(media.mediaType, mediaType) : undefined,
+            mediaTypesParam ? inArray(media.mediaType, mediaTypesParam) : undefined,
             afterDate ? gt(media.mediaCreatedAt, afterDate) : undefined,
             beforeDate ? lt(media.mediaCreatedAt, beforeDate) : undefined,
         )).limit(count ? +count : 10).offset(offset ? +offset : 0)

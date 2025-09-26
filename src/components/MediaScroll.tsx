@@ -1,29 +1,33 @@
 "use client"
 
-import { Media } from "@/db/types"
-import { useEffect, useState } from "react"
+import { Suspense, useEffect } from "react"
 import MediaShow from "./MediaShow"
 import { getMedias } from "@/actions/getMedia"
 import { useInView } from "react-intersection-observer"
+import { mediaNotFinished, mediaList, mediaOffset, filter } from "@/utils/signals"
+import { Show } from "@preact/signals-react/utils";
+import { useSignals } from "@preact/signals-react/runtime"
+import { filterTypeToPrimative } from "@/utils/clientUtil"
 
 export default function MediaScroll() {
-    const [medias, setMedias] = useState<Media[]>([])
-    const [offset, setOffset] = useState<number>(0)
-    const [finished, setFinished] = useState<boolean>(false)
+    useSignals();
     const { ref, inView } = useInView()
+    console.log("MediaScroll")
 
     async function loadMoreMedias() {
-        const apiMedias = await getMedias(offset, 10)
+        const f = filterTypeToPrimative(filter);
+        const apiMedias = await getMedias(mediaOffset.value, 10, f)
+        console.log("apiMedias: " + apiMedias)
         if (apiMedias.length <= 0){
-            setFinished(true);
+            mediaNotFinished.value = false
             return
         }
-        setMedias(medias => [...medias, ...apiMedias])
-        setOffset(offset => offset + 10)
+        mediaList.value = [...mediaList.value, ...apiMedias]
+        mediaOffset.value = mediaOffset.value + 10
     }
 
     useEffect(() => {
-        if (inView && !finished) {
+        if (inView && mediaNotFinished.value) {
             loadMoreMedias()
         }
     }, [inView])
@@ -31,17 +35,19 @@ export default function MediaScroll() {
     return (
         <div>
             <div className="grid grid-cols-4">
-                {medias.map((m) => (
+                <Suspense>
+                {mediaList.value.map((m) => (
                     <div key={m.id}>
                         <MediaShow media={m} />
                     </div>
                 ))}
+                </Suspense>
             </div>
-            {!finished &&
-            <div className="flex justify-center">
-                <div ref={ref} className="p-5 border-1 rounded-lg">Loading...</div>
-            </div>
-            }
+            <Show when={mediaNotFinished}>
+                <div className="flex justify-center">
+                    <div ref={ref} className="p-5 border-1 rounded-lg">Loading...</div>
+                </div>
+            </Show>
         </div>
     )
 }

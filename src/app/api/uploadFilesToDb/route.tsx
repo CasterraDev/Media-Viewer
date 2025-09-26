@@ -7,6 +7,15 @@ import { NextRequest, NextResponse } from 'next/server';
 import path from 'path';
 var mime = require("mime-types");
 
+const getType = (mimeType: string): string => {
+    if (mimeType.includes("image")) {
+        return "photos"
+    } else if (mimeType.includes("mp4")) {
+        return "videos"
+    }
+    return "photos"
+}
+
 const uploadFiles = async (filepath: string, mediaRoot: string): Promise<number> => {
     return new Promise((resolve, _reject) => {
         let newFiles = 0;
@@ -19,14 +28,14 @@ const uploadFiles = async (filepath: string, mediaRoot: string): Promise<number>
             const stats = await stat(filename);
 
             if (stats.isDirectory()) {
-               newFiles += await uploadFiles(filename, root);
+                newFiles += await uploadFiles(filename, root);
             } else {
                 const x = filename.replace(root, "");
                 let dir = path.dirname(x);
-                if (!dir.endsWith('/')){
+                if (!dir.endsWith('/')) {
                     dir = dir.concat('/')
                 }
-                if (dir.startsWith('/')){
+                if (dir.startsWith('/')) {
                     dir = dir.slice(1);
                 }
                 const name = path.basename(x);
@@ -41,12 +50,17 @@ const uploadFiles = async (filepath: string, mediaRoot: string): Promise<number>
                     return;
                 }
 
+                const mimeType: string = mime.lookup(file)
+
+                const type = getType(mimeType)
+
                 const m: typeof schema.media.$inferInsert = {
                     mediaFilename: name,
                     mediaDir: dir,
                     mediaRoot: root,
                     mediaFilePath: root + dir + name,
-                    mediaType: mime.lookup(file),
+                    mediaType: type,
+                    mediaMime: mimeType,
                     mediaSize: stats.size.toString(),
                     mediaCreatedAt: stats.birthtime.toISOString(),
                     mediaUpdatedAt: stats.mtime.toISOString(),

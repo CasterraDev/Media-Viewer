@@ -12,13 +12,14 @@ import {
 } from "@/components/ui/sheet"
 import { Button } from "./ui/button";
 import Link from "next/link";
+import Search from "./Search";
 
 export default function Topbar() {
 
     return (
-        <div className="p-3">
+        <div className="p-3 sticky top-0 z-50 bg-[var(--color-background)] flex flex-row gap-5">
             <Sheet>
-                <SheetTrigger asChild className="cursor-pointer">
+                <SheetTrigger asChild className="cursor-pointer w-fit">
                     <Button variant="outline">
                         <GiHamburgerMenu className="w-auto h-full" />
                     </Button>
@@ -37,6 +38,10 @@ export default function Topbar() {
                     </div>
                 </SheetContent>
             </Sheet>
+            <div className="grow" />
+            <div className="grow max-w-1/2">
+                <Search />
+            </div>
         </div>
     )
 }

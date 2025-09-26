@@ -12,6 +12,7 @@ export const media = pgTable("Media", {
     title: varchar("title", { length: 100 }),
     description: varchar("description", { length: 5000 }),
     mediaType: text().notNull(),
+    mediaMime: text().notNull(),
     mediaRoot: text().notNull(),
     mediaDir: text().notNull(),
     mediaFilename: text().notNull(),
