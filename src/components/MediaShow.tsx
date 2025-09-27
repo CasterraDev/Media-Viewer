@@ -1,4 +1,5 @@
 "use client"
+import { MediaSizing } from "@/_types/type";
 import { Media } from "@/db/types";
 import Image from "next/image";
 import { ReactNode, useEffect, useState } from "react"
@@ -6,7 +7,7 @@ import { FaPlay } from "react-icons/fa6";
 
 type MediaShowType = {
     media: Media
-    dimensionType: "square" | "landscape" | "portrait"
+    dimensionType: MediaSizing
     sizeScale?: number
 }
 
@@ -46,7 +47,7 @@ export default function MediaShow(props: MediaShowType) {
     }
 
     return (
-        <div className="w-full h-full">
+        <div className={`${MediaSizing[props.dimensionType]} w-full h-full`}>
             {
                 dynaMedia()
             }
