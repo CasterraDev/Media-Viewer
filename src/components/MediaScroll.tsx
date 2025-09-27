@@ -9,6 +9,8 @@ import { Show } from "@preact/signals-react/utils";
 import { useSignals } from "@preact/signals-react/runtime"
 import { filterTypeToPrimative, getMediaSizing } from "@/utils/clientUtil"
 import { MediaSizing } from "@/_types/type"
+import { effect } from "@preact/signals-react"
+import { Button } from "./ui/button"
 
 export default function MediaScroll() {
     useSignals();
@@ -162,8 +164,9 @@ export default function MediaScroll() {
                 </div>
             }
             <Show when={mediaNotFinished}>
-                <div className="flex justify-center mt-100">
-                    <div ref={ref} className="p-5 border-1 rounded-lg">Loading...</div>
+                <div className="flex flex-col justify-center mt-20 gap-3">
+                    <div ref={ref} className="w-fit mx-auto p-5 border-1 rounded-lg">Loading...</div>
+                    <Button onClick={loadMoreMedias} className="w-fit mx-auto p-5 border-1 rounded-lg">Load More</Button>
                 </div>
             </Show>
         </div>

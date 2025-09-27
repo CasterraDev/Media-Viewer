@@ -12,13 +12,12 @@ import {
 } from "@/components/ui/dialog"
 import { filter, mediaNotFinished, mediaList, mediaOffset } from "@/utils/signals";
 import { useSignals } from "@preact/signals-react/runtime";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuLabel, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuSeparator, DropdownMenuTrigger, Separator } from "@radix-ui/react-dropdown-menu";
-import { DropdownMenuCheckboxItem } from "./ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuSeparator, DropdownMenuTrigger, Separator } from "@radix-ui/react-dropdown-menu";
 
 function emptyMedia() {
-    mediaList.value = []
     mediaNotFinished.value = true
     mediaOffset.value = 0;
+    mediaList.value = []
 }
 
 function reset() {
