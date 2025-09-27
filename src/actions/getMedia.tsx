@@ -10,6 +10,9 @@ export const getMedias = async (offset: number, limit: number, filter?: FilterPr
             if (filter.sorting) {
                 params = params.concat(`&sorting=${filter.sorting}`)
             }
+            if (filter.sortBy) {
+                params = params.concat(`&sortBy=${filter.sortBy}`)
+            }
             if (filter.media.photos) {
                 params = params.concat(`&mediaTypes=photos`)
             }

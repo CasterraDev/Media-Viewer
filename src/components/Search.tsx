@@ -55,7 +55,7 @@ export default function Search() {
                             </DropdownMenuTrigger>
                             <DropdownMenuContent className="w-fit">
                                 <DropdownMenuSeparator />
-                                <DropdownMenuRadioGroup value={filter.sorting.value} onValueChange={(e) => filter.sorting.value = e as any}
+                                <DropdownMenuRadioGroup value={filter.sorting.value} onValueChange={(e) => {filter.sorting.value = e as any; emptyMedia()}}
                                     className="border-1 border-[var(--color-foreground)] w-fit mx-auto bg-[var(--color-background)]">
                                     {["ascending", "descending"].map((x) => (
                                         <DropdownMenuRadioItem key={x} value={x}
@@ -74,7 +74,7 @@ export default function Search() {
                             </DropdownMenuTrigger>
                             <DropdownMenuContent className="w-fit">
                                 <DropdownMenuSeparator />
-                                <DropdownMenuRadioGroup value={filter.sortBy.value} onValueChange={(e) => filter.sortBy.value = e as any}
+                                <DropdownMenuRadioGroup value={filter.sortBy.value} onValueChange={(e) => {filter.sortBy.value = e as any; emptyMedia()}}
                                     className="border-1 border-[var(--color-foreground)] w-fit mx-auto bg-[var(--color-background)]">
                                     {["created", "size"].map((x) => (
                                         <DropdownMenuRadioItem key={x} value={x}

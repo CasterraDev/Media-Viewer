@@ -34,7 +34,8 @@ export function filterTypeToPrimative(filter: Filter): FilterPrimative {
             photos: filter.media.photos.value,
             videos: filter.media.videos.value,
         },
-        sorting: filter.sorting.value
+        sorting: filter.sorting.value,
+        sortBy: filter.sortBy.value
     }
     return f;
 }
