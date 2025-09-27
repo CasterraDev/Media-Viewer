@@ -1,6 +1,6 @@
 "use client"
 
-import { ReactNode, ReactPortal, Suspense, useEffect, useState } from "react"
+import { ReactNode, Suspense, useEffect } from "react"
 import MediaShow from "./MediaShow"
 import { getMedias } from "@/actions/getMedia"
 import { useInView } from "react-intersection-observer"
@@ -12,7 +12,6 @@ import { MediaSizing } from "@/_types/type"
 
 export default function MediaScroll() {
     useSignals();
-    const [mediaReact, setMediaReact] = useState<ReactNode[]>([])
     const { ref, inView } = useInView()
     console.log("MediaScroll")
     const maxCols = 4
@@ -120,7 +119,7 @@ export default function MediaScroll() {
             } else {
                 r.push(
                     <div className={`Else ${relCntTillNotLandscape} ${halfSpots} grid w-full h-fit grid-cols-4`} key={m.id}>
-                        {[...Array(4)].map((k, idx)=>{
+                        {[...Array(4)].map((_k, idx)=>{
                             if (i + idx >= mediaList.value.length) return;
                             return (
                                 <MediaShow key={`${mediaList.value[i + idx].id}-show`} media={mediaList.value[i + idx]} dimensionType={getMediaSizing(mediaList.value[i + idx].mediaWidth, mediaList.value[i + idx].mediaHeight)} />

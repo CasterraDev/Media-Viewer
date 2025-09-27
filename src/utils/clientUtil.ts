@@ -19,7 +19,7 @@ export function secsIntoData(totalSeconds: number): { hours: number, minutes: nu
     return { hours, minutes, seconds }
 }
 
-export function secsIntoHexidecmal(totalSeconds: number) {
+export function secsIntoHexidecmal(totalSeconds: number): string {
     let data = secsIntoData(totalSeconds);
     let str = ``;
     if (data.hours != 0){

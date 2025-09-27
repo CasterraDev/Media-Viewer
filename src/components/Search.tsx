@@ -29,7 +29,6 @@ function reset() {
 
 export default function Search() {
     useSignals();
-    console.log("Search")
     return (
         <form className="flex flex-row gap-1 w-full">
             <Dialog>
