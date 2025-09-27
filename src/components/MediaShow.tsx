@@ -1,6 +1,7 @@
 "use client"
 import { MediaSizing } from "@/_types/type";
 import { Media } from "@/db/types";
+import { secsIntoHexidecmal } from "@/utils/clientUtil";
 import Image from "next/image";
 import { ReactNode, useEffect, useState } from "react"
 import { FaPlay } from "react-icons/fa6";
@@ -40,7 +41,10 @@ export default function MediaShow(props: MediaShowType) {
             return (
                 <div className="w-fit h-fit relative">
                     <video src={`/api/getMedia?mediaID=${media.id}`} />
-                    <FaPlay className="absolute top-0 right-0 z-10 m-1" />
+                    <div className="absolute top-0 right-0 z-10 m-1 flex flex-row gap-1">
+                        <p>{secsIntoHexidecmal(media.mediaDurationInSecs || 0)}</p>
+                        <FaPlay className="m-auto"/>
+                    </div>
                 </div>
             )
         }

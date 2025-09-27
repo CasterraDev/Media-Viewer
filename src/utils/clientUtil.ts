@@ -1,14 +1,31 @@
 import { Filter, FilterPrimative, MediaSizing } from "@/_types/type";
 
 export function getMediaSizing(width: number, height: number): MediaSizing {
-    if (width == height){
+    if (width == height) {
         return MediaSizing.square;
-    }else if (width > height){
+    } else if (width > height) {
         return MediaSizing.landscape
-    }else if (width < height){
+    } else if (width < height) {
         return MediaSizing.portrait
     }
     return MediaSizing.square
+}
+
+export function secsIntoData(totalSeconds: number): { hours: number, minutes: number, seconds: number } {
+    let hours = Math.floor(totalSeconds / 3600);
+    totalSeconds %= 3600;
+    let minutes = Math.floor(totalSeconds / 60);
+    let seconds = totalSeconds % 60;
+    return { hours, minutes, seconds }
+}
+
+export function secsIntoHexidecmal(totalSeconds: number) {
+    let data = secsIntoData(totalSeconds);
+    let str = ``;
+    if (data.hours != 0){
+        str.concat(`${data.hours.toString().padStart(2, "0")}:`)
+    }
+    return `${str}${data.minutes.toString().padStart(2, "0")}:${data.seconds.toString().padStart(2, "0")}`
 }
 
 export function filterTypeToPrimative(filter: Filter): FilterPrimative {
