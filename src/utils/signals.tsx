@@ -12,5 +12,6 @@ export const filter: Filter = {
         photos: signal(true),
         videos: signal(true)
     },
-    sorting: signal("ascending")
+    sorting: signal("ascending"),
+    sortBy: signal("created")
 }

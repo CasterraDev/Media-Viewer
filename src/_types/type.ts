@@ -30,10 +30,10 @@ export type MediaTypes = {
     videos: Signal<boolean>
 }
 
-
 export type Filter = {
     media: MediaTypes,
     sorting: Signal<"ascending" | "descending">
+    sortBy: Signal<"created" | "size">
 }
 
 export type FilterPrimative = {
@@ -42,4 +42,5 @@ export type FilterPrimative = {
         videos: boolean
     },
     sorting: "ascending" | "descending"
+    sortBy: "created" | "size"
 }
