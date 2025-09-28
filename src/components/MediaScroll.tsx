@@ -4,13 +4,14 @@ import { ReactNode, Suspense, useEffect } from "react"
 import MediaShow from "./MediaShow"
 import { getMedias } from "@/actions/getMedia"
 import { useInView } from "react-intersection-observer"
-import { mediaNotFinished, mediaList, mediaOffset, filter } from "@/utils/signals"
+import { mediaNotFinished, mediaList, mediaOffset, filter, mediaPresentIdx } from "@/utils/signals"
 import { Show } from "@preact/signals-react/utils";
 import { useSignals } from "@preact/signals-react/runtime"
 import { filterTypeToPrimative, getMediaSizing } from "@/utils/clientUtil"
 import { MediaSizing } from "@/_types/type"
 import { effect } from "@preact/signals-react"
 import { Button } from "./ui/button"
+import MediaPresent from "./MediaPresent"
 
 export default function MediaScroll() {
     useSignals();
@@ -87,10 +88,10 @@ export default function MediaScroll() {
                 r.push(
                     <div className="Portrait grid w-full h-full" key={m.id}
                         style={{ "gridTemplateColumns": `repeat(${maxCols}, minmax(0, 1fr))` }}>
-                        <MediaShow media={m} dimensionType={MediaSizing.portrait} />
-                        <MediaShow media={mediaList.value[i + 1]} dimensionType={MediaSizing.portrait} />
-                        <MediaShow media={mediaList.value[i + 2]} dimensionType={MediaSizing.portrait} />
-                        <MediaShow media={mediaList.value[i + 3]} dimensionType={MediaSizing.portrait} />
+                        <MediaShow media={m} idx={i} dimensionType={MediaSizing.portrait} />
+                        <MediaShow media={mediaList.value[i + 1]} idx={i + 1} dimensionType={MediaSizing.portrait} />
+                        <MediaShow media={mediaList.value[i + 2]} idx={i + 2} dimensionType={MediaSizing.portrait} />
+                        <MediaShow media={mediaList.value[i + 3]} idx={i + 3} dimensionType={MediaSizing.portrait} />
                     </div>
                 )
                 advance = maxCols - 1
@@ -100,10 +101,10 @@ export default function MediaScroll() {
                 r.push(
                     <div className="Square grid w-full h-full" key={m.id}
                         style={{ "gridTemplateColumns": `repeat(${maxCols}, minmax(0, 1fr))` }}>
-                        <MediaShow media={m} dimensionType={MediaSizing.square} />
-                        <MediaShow media={mediaList.value[i + 1]} dimensionType={MediaSizing.square} />
-                        <MediaShow media={mediaList.value[i + 2]} dimensionType={MediaSizing.square} />
-                        <MediaShow media={mediaList.value[i + 3]} dimensionType={MediaSizing.square} />
+                        <MediaShow media={m} idx={i} dimensionType={MediaSizing.square} />
+                        <MediaShow media={mediaList.value[i + 1]} idx={i + 1} dimensionType={MediaSizing.square} />
+                        <MediaShow media={mediaList.value[i + 2]} idx={i + 2} dimensionType={MediaSizing.square} />
+                        <MediaShow media={mediaList.value[i + 3]} idx={i + 3} dimensionType={MediaSizing.square} />
                     </div>
                 )
                 advance = maxCols - 1
@@ -113,18 +114,18 @@ export default function MediaScroll() {
                 r.push(
                     <div className="Landscape grid w-full h-full" key={m.id}
                         style={{ "gridTemplateColumns": `repeat(${halfSpots}, minmax(0, 1fr))` }}>
-                        <MediaShow media={m} dimensionType={MediaSizing.landscape} />
-                        <MediaShow media={mediaList.value[i + 1]} dimensionType={MediaSizing.landscape} />
+                        <MediaShow media={m} idx={i} dimensionType={MediaSizing.landscape} />
+                        <MediaShow media={mediaList.value[i + 1]} idx={i + 1} dimensionType={MediaSizing.landscape} />
                     </div>
                 )
                 advance = halfSpots - 1
             } else {
                 r.push(
                     <div className={`Else ${relCntTillNotLandscape} ${halfSpots} grid w-full h-fit grid-cols-4`} key={m.id}>
-                        {[...Array(4)].map((_k, idx)=>{
+                        {[...Array(4)].map((_k, idx) => {
                             if (i + idx >= mediaList.value.length) return;
                             return (
-                                <MediaShow key={`${mediaList.value[i + idx].id}-show`} media={mediaList.value[i + idx]} dimensionType={getMediaSizing(mediaList.value[i + idx].mediaWidth, mediaList.value[i + idx].mediaHeight)} />
+                                <MediaShow idx={i + idx} key={`${mediaList.value[i + idx].id}-show`} media={mediaList.value[i + idx]} dimensionType={getMediaSizing(mediaList.value[i + idx].mediaWidth, mediaList.value[i + idx].mediaHeight)} />
                             )
                         })}
                     </div>
@@ -142,9 +143,9 @@ export default function MediaScroll() {
         return (
             <div className="grid w-full h-fit grid-cols-4">
                 <Suspense>
-                    {mediaList.value.map((m) => (
+                    {mediaList.value.map((m, i) => (
                         <div key={m.id}>
-                            <MediaShow media={m} dimensionType={MediaSizing.portrait} />
+                            <MediaShow media={m} idx={i} dimensionType={MediaSizing.portrait} />
                         </div>
                     ))}
                 </Suspense>
@@ -162,6 +163,9 @@ export default function MediaScroll() {
                 <div className="flex flex-col">
                     {mediaGrid([], maxCols, 1)}
                 </div>
+            }
+            {mediaPresentIdx.value != null && 
+                <MediaPresent mediaIdx={mediaPresentIdx.value} />
             }
             <Show when={mediaNotFinished}>
                 <div className="flex flex-col justify-center mt-20 gap-3">

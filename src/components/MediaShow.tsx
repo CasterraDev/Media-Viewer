@@ -3,18 +3,25 @@ import { MediaSizing } from "@/_types/type";
 import { Media } from "@/db/types";
 import { secsIntoHexidecmal } from "@/utils/clientUtil";
 import Image from "next/image";
-import { ReactNode, useEffect, useState } from "react"
+import { ReactNode, useState } from "react"
 import { FaPlay } from "react-icons/fa6";
+import MediaPresent from "./MediaPresent";
+import { mediaPresentIdx } from "@/utils/signals";
 
 type MediaShowType = {
     media: Media
+    idx: number
     dimensionType: MediaSizing
     sizeScale?: number
 }
 
+function mediaClick(idx: number) {
+    mediaPresentIdx.value = idx;
+}
+
 const photoReact = (m: MediaShowType): ReactNode => {
     return (
-        <div className="relative w-full h-fit">
+        <button className="relative w-full h-fit" onClick={() => mediaClick(m.idx)}>
             <Image
                 alt={`${m.media.title || m.media.mediaFilename}`}
                 src={`/api/getMedia?mediaID=${m.media.id}`}
@@ -26,7 +33,7 @@ const photoReact = (m: MediaShowType): ReactNode => {
                 width={500}
                 height={300}
             />
-        </div>
+        </button>
     )
 }
 
@@ -39,13 +46,13 @@ export default function MediaShow(props: MediaShowType) {
             return photoReact(props);
         } else {
             return (
-                <div className="w-fit h-fit relative">
+                <button className="relative w-full h-fit" onClick={() => mediaClick(props.idx)}>
                     <video src={`/api/getMedia?mediaID=${media.id}`} />
                     <div className="absolute top-0 right-0 z-10 m-1 flex flex-row gap-1">
                         <p>{secsIntoHexidecmal(media.mediaDurationInSecs || 0)}</p>
-                        <FaPlay className="m-auto"/>
+                        <FaPlay className="m-auto" />
                     </div>
-                </div>
+                </button>
             )
         }
     }

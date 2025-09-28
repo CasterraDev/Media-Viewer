@@ -6,6 +6,7 @@ export let refreshMediaList: Signal<number> = signal(0)
 export let mediaList: Signal<Media[]> = signal([])
 export let mediaNotFinished: Signal<boolean> = signal(true)
 export let mediaOffset: Signal<number> = signal(0)
+export let mediaPresentIdx: Signal<number | null> = signal(null)
 
 export const filter: Filter = {
     media: {
