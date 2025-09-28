@@ -13,5 +13,6 @@ export const filter: Filter = {
         videos: signal(true)
     },
     sorting: signal("ascending"),
-    sortBy: signal("created")
+    sortBy: signal("created"),
+    search: signal("")
 }

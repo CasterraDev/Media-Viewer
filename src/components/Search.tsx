@@ -13,6 +13,7 @@ import {
 import { filter, mediaNotFinished, mediaList, mediaOffset } from "@/utils/signals";
 import { useSignals } from "@preact/signals-react/runtime";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuSeparator, DropdownMenuTrigger, Separator } from "@radix-ui/react-dropdown-menu";
+import { FormEvent } from "react";
 
 function emptyMedia() {
     mediaNotFinished.value = true
@@ -26,20 +27,19 @@ function reset() {
 
     filter.sorting.value = "ascending"
     filter.sortBy.value = "created"
+    filter.search.value = ""
     emptyMedia()
 }
 
-// <div className="flex flex-row gap-1" key={x}>
-//     <input type="radio" name="sorting" id={x} value={x}
-//         onChange={(e) => { filter.sorting.value = e.target.value as any; emptyMedia() }}
-//         defaultChecked={filter.sorting.value == x} />
-//     <label htmlFor={x} className="capitalize">{x}</label>
-// </div>
+function submit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    emptyMedia();
+}
 
 export default function Search() {
     useSignals();
     return (
-        <form className="flex flex-row gap-1 w-full">
+        <form className="flex flex-row gap-1 w-full" onSubmit={submit}>
             <Dialog>
                 <DialogTrigger>Filter</DialogTrigger>
                 <DialogContent aria-describedby="Filter">
@@ -102,7 +102,7 @@ export default function Search() {
                     <Button variant="secondary" type="reset" onClick={reset}>Reset</Button>
                 </DialogContent>
             </Dialog>
-            <Input type="search" />
+            <Input type="search" name="search" placeholder="Search" autoComplete="off" onChange={(e) => filter.search.value = e.target.value}/>
             <Button type="submit" variant="outline"><FaMagnifyingGlass className="bg-[var(--color-background)] text-[var(--color-foreground)]" /></Button>
         </form>
     )

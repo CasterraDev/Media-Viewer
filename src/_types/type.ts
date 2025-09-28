@@ -34,6 +34,7 @@ export type Filter = {
     media: MediaTypes,
     sorting: Signal<"ascending" | "descending">
     sortBy: Signal<"created" | "size">
+    search: Signal<string>
 }
 
 export type FilterPrimative = {
@@ -43,4 +44,5 @@ export type FilterPrimative = {
     },
     sorting: "ascending" | "descending"
     sortBy: "created" | "size"
+    search: string
 }

@@ -2,25 +2,89 @@
 
 import { FilterPrimative } from "@/_types/type"
 
+function pushDict(d: { [id: string]: any }, defaultVal: any, k: string, v: any) {
+    if (!d[k]) {
+        d[k] = defaultVal
+    }
+    d[k].push(v);
+}
+
+function parseSearch(s: string, d: { [id: string]: string | string[] }): { [id: string]: string | string[] } {
+    let cmd: string = s.substring(s.indexOf("{")+1, s.indexOf("}"))
+    let settings = cmd.split("&")
+    if (settings[0] == "" || settings == null) return d
+    settings.map((x) => {
+        let data = x.split(":")
+        let key = data[0].trim().toLowerCase()
+        let value = data[1].trim()
+        let firstType = true;
+        console.log("Key: " + key + ", Val: " + value)
+
+        // I want the search cmds to override the filter UI options
+        switch (key) {
+            case "sorting":
+                d["sorting"] = value
+                break;
+            case "sortby":
+                d["sortBy"] = value
+                break;
+            case "type":
+                if (firstType) {
+                    d["mediaTypes"] = [value]
+                    firstType = false;
+                } else {
+                    if (Array.isArray(d["mediaTypes"])){
+                        d["mediaTypes"].push(value)
+                    }
+                }
+                break;
+            default:
+                break;
+        }
+    })
+    return d;
+}
+
 export const getMedias = async (offset: number, limit: number, filter?: FilterPrimative) => {
     try {
+        let d: { [id: string]: string | string[] } = {}
         let params = `offset=${offset}&limit=${limit}`
         if (filter) {
-            // TODO: This is bad
             if (filter.sorting) {
-                params = params.concat(`&sorting=${filter.sorting}`)
+                d["sorting"] =  filter.sorting;
             }
             if (filter.sortBy) {
-                params = params.concat(`&sortBy=${filter.sortBy}`)
+                d["sortBy"] = filter.sortBy;
             }
             if (filter.media.photos) {
-                params = params.concat(`&mediaTypes=photos`)
+                pushDict(d, [], "mediaTypes", "photos");
             }
             if (filter.media.videos) {
-                params = params.concat(`&mediaTypes=videos`)
+                pushDict(d, [], "mediaTypes", "videos");
             }
+            if (filter.search != "") {
+                d = parseSearch(filter.search, d);
+            }
+
+            if (d["sorting"]) {
+                params = params.concat(`&sorting=${d["sorting"]}`)
+            }
+            if (d["sortBy"]) {
+                params = params.concat(`&sortBy=${d["sortBy"]}`)
+            }
+            if (d["mediaTypes"] && Array.isArray(d["mediaTypes"])) {
+                d["mediaTypes"].map((x) => {
+                    params = params.concat(`&mediaTypes=${x}`)
+                })
+            }
+            // if (filter.search != ""){
+            //     params = params.concat(`&search=${encodeURI(filter.search)}`)
+            // }
         }
-        console.log(params)
+        console.log("Filter Dictionary:")
+        console.log(d)
+        console.log("Params: " + params)
+        console.log("Filter:")
         console.log(filter)
         const response = await fetch(`http://localhost:3000/api/getMediaScroller?${params}`)
         const data = (await response.json())
