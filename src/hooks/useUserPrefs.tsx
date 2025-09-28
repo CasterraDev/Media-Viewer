@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 const defaultUserPrefs: UserPrefs = {
   sortType: "",
   mediaRoots: [],
+  mediaLoop: false,
+  mediaAutoplay: false
 }
 
 const getLocalStorage = (key: string): UserPrefs => {

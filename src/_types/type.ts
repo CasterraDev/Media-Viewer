@@ -22,7 +22,9 @@ export enum MediaType {
 
 export type UserPrefs = {
   sortType: string,
-  mediaRoots: string[]
+  mediaRoots: string[],
+  mediaLoop: boolean,
+  mediaAutoplay: boolean
 }
 
 export type MediaTypes = {
