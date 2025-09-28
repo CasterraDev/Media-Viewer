@@ -77,9 +77,10 @@ export const getMedias = async (offset: number, limit: number, filter?: FilterPr
                     params = params.concat(`&mediaTypes=${x}`)
                 })
             }
-            // if (filter.search != ""){
-            //     params = params.concat(`&search=${encodeURI(filter.search)}`)
-            // }
+            if (filter.search != ""){
+                let xs = filter.search.substring(filter.search.indexOf("{")+1)
+                params = params.concat(`&search=${encodeURI(xs)}`)
+            }
         }
         console.log("Filter Dictionary:")
         console.log(d)
