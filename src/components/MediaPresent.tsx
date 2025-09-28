@@ -16,9 +16,18 @@ function close() {
 }
 
 function keyDownHandler(e: KeyboardEvent) {
-    if (e.code == 'Escape') {
+    if (e.code == 'Escape' || e.code == 'ControlRight') {
         close()
+    } else if (e.code == 'ArrowRight') {
+        if (mediaPresentIdx.value) {
+            changeMedia(1, mediaPresentIdx.value)
+        }
+    } else if (e.code == 'ArrowLeft') {
+        if (mediaPresentIdx.value) {
+            changeMedia(-1, mediaPresentIdx.value)
+        }
     }
+    console.log(e.code)
 }
 
 const dynaMedia = (m: Media): ReactNode => {
@@ -53,10 +62,11 @@ function changeMedia(side: number, idx: number) {
     if ((side == -1 || !side) && idx > 0) {
         mediaPresentIdx.value = idx - 1;
     } else {
-        if (idx < mediaList.value.length) {
+        if (idx < mediaList.value.length - 1) {
             mediaPresentIdx.value = idx + 1;
         }
     }
+    document.getElementById(`Media-Show-${mediaPresentIdx}`)?.scrollIntoView();
 }
 
 export default function MediaPresent({ mediaIdx }: { mediaIdx: number }) {

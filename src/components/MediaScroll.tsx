@@ -9,9 +9,9 @@ import { Show } from "@preact/signals-react/utils";
 import { useSignals } from "@preact/signals-react/runtime"
 import { filterTypeToPrimative, getMediaSizing } from "@/utils/clientUtil"
 import { MediaSizing } from "@/_types/type"
-import { effect } from "@preact/signals-react"
 import { Button } from "./ui/button"
 import MediaPresent from "./MediaPresent"
+
 
 export default function MediaScroll() {
     useSignals();
@@ -164,7 +164,7 @@ export default function MediaScroll() {
                     {mediaGrid([], maxCols, 1)}
                 </div>
             }
-            {mediaPresentIdx.value != null && 
+            {mediaPresentIdx.value != null &&
                 <MediaPresent mediaIdx={mediaPresentIdx.value} />
             }
             <Show when={mediaNotFinished}>

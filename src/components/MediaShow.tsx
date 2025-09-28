@@ -5,7 +5,6 @@ import { secsIntoHexidecmal } from "@/utils/clientUtil";
 import Image from "next/image";
 import { ReactNode, useState } from "react"
 import { FaPlay } from "react-icons/fa6";
-import MediaPresent from "./MediaPresent";
 import { mediaPresentIdx } from "@/utils/signals";
 
 type MediaShowType = {
@@ -46,7 +45,8 @@ export default function MediaShow(props: MediaShowType) {
             return photoReact(props);
         } else {
             return (
-                <button className="relative w-full h-fit" onClick={() => mediaClick(props.idx)}>
+                <button
+                    className="relative w-full h-fit" onClick={() => mediaClick(props.idx)}>
                     <video src={`/api/getMedia?mediaID=${media.id}`} />
                     <div className="absolute top-0 right-0 z-10 m-1 flex flex-row gap-1">
                         <p>{secsIntoHexidecmal(media.mediaDurationInSecs || 0)}</p>
@@ -58,7 +58,7 @@ export default function MediaShow(props: MediaShowType) {
     }
 
     return (
-        <div className={`${MediaSizing[props.dimensionType]} w-full h-full`}>
+        <div id={`Media-Show-${props.idx}`} className={`MediaShow ${MediaSizing[props.dimensionType]} w-full h-full`}>
             {
                 dynaMedia()
             }
