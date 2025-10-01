@@ -6,7 +6,7 @@ var assert = require('assert');
 export const getType = (mimeType: string): MediaType => {
     if (mimeType.includes("image")) {
         return MediaType.photos
-    } else if (mimeType.includes("mp4")) {
+    } else if (mimeType.includes("mp4") || mimeType.includes("video")) {
         return MediaType.videos
     }
     return MediaType.photos
@@ -30,20 +30,19 @@ export const getType = (mimeType: string): MediaType => {
 // }
 
 export const getVideoData = (filename: string): Promise<{ width: number, height: number, durationInSecs: number }> => {
-    return new Promise((resolve, _reject) => {
-        exec(`ffprobe -v error -of flat=s=_ -select_streams v:0 -show_entries stream=height,width,duration ${filename}`, (error, stdout, stderr) => {
+    return new Promise((resolve, reject) => {
+        exec(`ffprobe -v error -of flat=s=_ -select_streams v:0 -show_entries stream=height,width -show_entries format=duration "${filename}"`, (error, stdout, stderr) => {
             if (error || stderr){
-                _reject("Error occured")
+                reject(`Error occurred ${stderr}`)
             }
             console.log(stdout)
             var width = /width=(\d+)/.exec(stdout);
             var height = /height=(\d+)/.exec(stdout);
             var duration = /duration="([\d\.]+)"/.exec(stdout);
-            var d = /duration="(\d+)"/
             console.log(duration)
             assert(width && height, 'No dimensions found!');
             if (width == null || height == null || !duration) {
-                _reject("Error occured")
+                reject(`Error occurred ${stderr}`)
             }
             resolve({
                 width: parseInt((width as any)[1]),

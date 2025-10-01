@@ -11,6 +11,7 @@ import { filterTypeToPrimative, getMediaSizing } from "@/utils/clientUtil"
 import { MediaSizing } from "@/_types/type"
 import { Button } from "./ui/button"
 import MediaPresent from "./MediaPresent"
+import MediaGrid from "./MediaGrid"
 
 
 export default function MediaScroll() {
@@ -88,10 +89,10 @@ export default function MediaScroll() {
                 r.push(
                     <div className="Portrait grid w-full h-full" key={m.id}
                         style={{ "gridTemplateColumns": `repeat(${maxCols}, minmax(0, 1fr))` }}>
-                        <MediaShow media={m} idx={i} dimensionType={MediaSizing.portrait} />
-                        <MediaShow media={mediaList.value[i + 1]} idx={i + 1} dimensionType={MediaSizing.portrait} />
-                        <MediaShow media={mediaList.value[i + 2]} idx={i + 2} dimensionType={MediaSizing.portrait} />
-                        <MediaShow media={mediaList.value[i + 3]} idx={i + 3} dimensionType={MediaSizing.portrait} />
+                        <MediaShow sizeScale={.25} media={m} idx={i} dimensionType={MediaSizing.portrait} />
+                        <MediaShow sizeScale={.25} media={mediaList.value[i + 1]} idx={i + 1} dimensionType={MediaSizing.portrait} />
+                        <MediaShow sizeScale={.25} media={mediaList.value[i + 2]} idx={i + 2} dimensionType={MediaSizing.portrait} />
+                        <MediaShow sizeScale={.25} media={mediaList.value[i + 3]} idx={i + 3} dimensionType={MediaSizing.portrait} />
                     </div>
                 )
                 advance = maxCols - 1
@@ -101,10 +102,10 @@ export default function MediaScroll() {
                 r.push(
                     <div className="Square grid w-full h-full" key={m.id}
                         style={{ "gridTemplateColumns": `repeat(${maxCols}, minmax(0, 1fr))` }}>
-                        <MediaShow media={m} idx={i} dimensionType={MediaSizing.square} />
-                        <MediaShow media={mediaList.value[i + 1]} idx={i + 1} dimensionType={MediaSizing.square} />
-                        <MediaShow media={mediaList.value[i + 2]} idx={i + 2} dimensionType={MediaSizing.square} />
-                        <MediaShow media={mediaList.value[i + 3]} idx={i + 3} dimensionType={MediaSizing.square} />
+                        <MediaShow sizeScale={.25} media={m} idx={i} dimensionType={MediaSizing.square} />
+                        <MediaShow sizeScale={.25} media={mediaList.value[i + 1]} idx={i + 1} dimensionType={MediaSizing.square} />
+                        <MediaShow sizeScale={.25} media={mediaList.value[i + 2]} idx={i + 2} dimensionType={MediaSizing.square} />
+                        <MediaShow sizeScale={.25} media={mediaList.value[i + 3]} idx={i + 3} dimensionType={MediaSizing.square} />
                     </div>
                 )
                 advance = maxCols - 1
@@ -114,8 +115,8 @@ export default function MediaScroll() {
                 r.push(
                     <div className="Landscape grid w-full h-full" key={m.id}
                         style={{ "gridTemplateColumns": `repeat(${halfSpots}, minmax(0, 1fr))` }}>
-                        <MediaShow media={m} idx={i} dimensionType={MediaSizing.landscape} />
-                        <MediaShow media={mediaList.value[i + 1]} idx={i + 1} dimensionType={MediaSizing.landscape} />
+                        <MediaShow sizeScale={.25} media={m} idx={i} dimensionType={MediaSizing.landscape} />
+                        <MediaShow sizeScale={.25} media={mediaList.value[i + 1]} idx={i + 1} dimensionType={MediaSizing.landscape} />
                     </div>
                 )
                 advance = halfSpots - 1
@@ -125,7 +126,7 @@ export default function MediaScroll() {
                         {[...Array(4)].map((_k, idx) => {
                             if (i + idx >= mediaList.value.length) return;
                             return (
-                                <MediaShow idx={i + idx} key={`${mediaList.value[i + idx].id}-show`} media={mediaList.value[i + idx]} dimensionType={getMediaSizing(mediaList.value[i + idx].mediaWidth, mediaList.value[i + idx].mediaHeight)} />
+                                <MediaShow sizeScale={.25} idx={i + idx} key={`${mediaList.value[i + idx].id}-show`} media={mediaList.value[i + idx]} dimensionType={getMediaSizing(mediaList.value[i + idx].mediaWidth, mediaList.value[i + idx].mediaHeight)} />
                             )
                         })}
                     </div>
@@ -155,13 +156,14 @@ export default function MediaScroll() {
 
     return (
         <div className="w-full h-fit">
-            {false ?
+            {true ?
                 <>
                     {easyGrid()}
                 </>
                 :
                 <div className="flex flex-col">
-                    {mediaGrid([], maxCols, 1)}
+                    {/*mediaGrid([], maxCols, 1)*/}
+                    <MediaGrid />
                 </div>
             }
             {mediaPresentIdx.value != null &&

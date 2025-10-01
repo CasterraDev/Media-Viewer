@@ -82,11 +82,11 @@ export const getMedias = async (offset: number, limit: number, filter?: FilterPr
                 params = params.concat(`&search=${encodeURI(xs)}`)
             }
         }
-        console.log("Filter Dictionary:")
-        console.log(d)
-        console.log("Params: " + params)
-        console.log("Filter:")
-        console.log(filter)
+        // console.log("Filter Dictionary:")
+        // console.log(d)
+        // console.log("Params: " + params)
+        // console.log("Filter:")
+        // console.log(filter)
         const response = await fetch(`http://localhost:3000/api/getMediaScroller?${params}`)
         const data = (await response.json())
         return data.medias

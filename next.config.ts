@@ -7,6 +7,7 @@ const nextConfig: NextConfig = {
         pathname: '/api/getMedia**',
       },
     ],
+    formats: ['image/webp'],
   },
 };
 

@@ -11,73 +11,86 @@ import { getType, getVideoData } from '@/utils/util';
 import { MediaType } from '@/_types/type';
 
 const uploadFiles = async (filepath: string, mediaRoot: string): Promise<number> => {
-    return new Promise((resolve, _reject) => {
+    return new Promise((resolve, reject) => {
         let newFiles = 0;
+        let mt: { name: string, type: string } = { name: "", type: "" }
         readdirSync(filepath).forEach(async (file) => {
-            // TODO: Check the dir and/or root so we aren't querying every file
-            console.log(file);
-            const root = mediaRoot.endsWith('/') ? mediaRoot : mediaRoot + '/'
-            const filename = filepath + "/" + file;
+            try {
+                // TODO: Check the dir and/or root so we aren't querying every file
+                console.log(file);
+                const root = mediaRoot.endsWith('/') ? mediaRoot : mediaRoot + '/'
+                const filename = filepath + "/" + file;
 
-            const stats = await stat(filename);
+                const stats = await stat(filename);
 
-            if (stats.isDirectory()) {
-                newFiles += await uploadFiles(filename, root);
-            } else {
-                const x = filename.replace(root, "");
-                let dir = path.dirname(x);
-                if (!dir.endsWith('/')) {
-                    dir = dir.concat('/')
+                if (stats.isDirectory()) {
+                    newFiles += await uploadFiles(filename, root);
+                } else {
+                    const x = filename.replace(root, "");
+                    let dir = path.dirname(x);
+                    if (!dir.endsWith('/')) {
+                        dir = dir.concat('/')
+                    }
+                    if (dir.startsWith('/')) {
+                        dir = dir.slice(1);
+                    }
+                    const name = path.basename(x);
+
+                    const check = await db.select().from(media).where(and(
+                        eq(media.mediaRoot, root),
+                        eq(media.mediaDir, dir),
+                        eq(media.mediaFilename, name),
+                    )).limit(1)
+
+                    if (check.length > 0) {
+                        return;
+                    }
+
+                    const mimeType: string = mime.lookup(file)
+                    // Return if file is not supported
+                    if (mimeType.includes("json")) {
+                        return
+                    }
+                    mt.name = file;
+                    mt.type = mimeType;
+                    console.log(`MT: ${mt.name}, ${mt.type}`)
+
+                    const type = getType(mimeType)
+                    let width = 0, height = 0, duration: number | null = null;
+
+                    if (type == MediaType.videos) {
+                        const videoData = await getVideoData(filename);
+                        width = videoData.width
+                        height = videoData.height
+                        duration = videoData.durationInSecs
+                    } else {
+                        const dimensions = await imageSizeFromFile(filename)
+                        width = dimensions.width
+                        height = dimensions.height
+                    }
+
+                    const m: typeof schema.media.$inferInsert = {
+                        mediaFilename: name,
+                        mediaDir: dir,
+                        mediaRoot: root,
+                        mediaFilePath: root + dir + name,
+                        mediaType: MediaType[type],
+                        mediaMime: mimeType,
+                        mediaWidth: width,
+                        mediaHeight: height,
+                        mediaSize: stats.size.toString(),
+                        mediaCreatedAt: stats.birthtime.toISOString(),
+                        mediaUpdatedAt: stats.mtime.toISOString(),
+                    };
+                    if (duration) {
+                        m.mediaDurationInSecs = duration;
+                    }
+
+                    await db.insert(media).values(m)
                 }
-                if (dir.startsWith('/')) {
-                    dir = dir.slice(1);
-                }
-                const name = path.basename(x);
-
-                const check = await db.select().from(media).where(and(
-                    eq(media.mediaRoot, root),
-                    eq(media.mediaDir, dir),
-                    eq(media.mediaFilename, name),
-                )).limit(1)
-
-                if (check.length > 0) {
-                    return;
-                }
-
-                const mimeType: string = mime.lookup(file)
-
-                const type = getType(mimeType)
-                let width = 0, height = 0, duration: number | null = null;
-
-                if (type == MediaType.videos){
-                    const videoData = await getVideoData(filename);
-                    width = videoData.width
-                    height = videoData.height
-                    duration = videoData.durationInSecs
-                }else {
-                    const dimensions = await imageSizeFromFile(filename)
-                    width = dimensions.width
-                    height = dimensions.height
-                }
-
-                const m: typeof schema.media.$inferInsert = {
-                    mediaFilename: name,
-                    mediaDir: dir,
-                    mediaRoot: root,
-                    mediaFilePath: root + dir + name,
-                    mediaType: MediaType[type],
-                    mediaMime: mimeType,
-                    mediaWidth: width,
-                    mediaHeight: height,
-                    mediaSize: stats.size.toString(),
-                    mediaCreatedAt: stats.birthtime.toISOString(),
-                    mediaUpdatedAt: stats.mtime.toISOString(),
-                };
-                if (duration){
-                    m.mediaDurationInSecs = duration;
-                }
-
-                await db.insert(media).values(m)
+            } catch (error) {
+                console.log(`Error Occurred: ${error} File: ${file} MT: ${mt.name}, ${mt.type}`)
+                reject(`Error Occurred: ${error} File: ${file} MT: ${mt.name}, ${mt.type}`);
             }
         })
         resolve(newFiles);

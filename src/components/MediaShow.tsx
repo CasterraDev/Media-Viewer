@@ -18,36 +18,34 @@ function mediaClick(idx: number) {
     mediaPresentIdx.value = idx;
 }
 
-const photoReact = (m: MediaShowType): ReactNode => {
-    return (
-        <button className="relative w-full h-fit" onClick={() => mediaClick(m.idx)}>
-            <Image
-                alt={`${m.media.title || m.media.mediaFilename}`}
-                src={`/api/getMedia?mediaID=${m.media.id}`}
-                sizes={m.sizeScale ? `calc(100vw * ${m.sizeScale})` : "100vw"}
-                style={{
-                    width: '100%',
-                    height: 'auto',
-                }}
-                width={500}
-                height={300}
-            />
-        </button>
-    )
-}
-
 export default function MediaShow(props: MediaShowType) {
-    const [media, setMedia] = useState<Media>(props.media);
+    const [media, _setMedia] = useState<Media>(props.media);
 
     const dynaMedia = (): ReactNode => {
         if (!media) return;
         if (media.mediaType.includes("photos")) {
-            return photoReact(props);
+            return (
+                <button className="relative w-full h-fit" onClick={() => mediaClick(props.idx)}>
+                    <Image
+                        alt={`${media.title || media.mediaFilename}`}
+                        src={`/api/getMedia?mediaID=${media.id}`}
+                        sizes={props.sizeScale ? `calc(100vw * ${props.sizeScale})` : "100vw"}
+                        style={{
+                            width: '100%',
+                            height: 'auto',
+                        }}
+                        width={500}
+                        height={300}
+                    />
+                </button>
+            )
         } else {
             return (
                 <button
                     className="relative w-full h-fit" onClick={() => mediaClick(props.idx)}>
-                    <video src={`/api/getMedia?mediaID=${media.id}`} />
+                    <video preload="metadata">
+                        <source src={`/api/getMedia?mediaID=${media.id}`} />
+                    </video>
                     <div className="absolute top-0 right-0 z-10 m-1 flex flex-row gap-1">
                         <p>{secsIntoHexidecmal(media.mediaDurationInSecs || 0)}</p>
                         <FaPlay className="m-auto" />
