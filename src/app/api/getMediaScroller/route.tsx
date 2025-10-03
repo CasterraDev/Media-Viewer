@@ -13,9 +13,19 @@ export async function GET(
         const sortingParam = req.nextUrl.searchParams.get("sorting");
         const sortByParam = req.nextUrl.searchParams.get("sortBy");
         const sizeParam = req.nextUrl.searchParams.get("size");
-        const searchParam = req.nextUrl.searchParams.get("search");
+        const searchParam = req.nextUrl.searchParams.getAll("search");
         const count = req.nextUrl.searchParams.get("count");
         const offset = req.nextUrl.searchParams.get("offset");
+
+        let searchArr: SQLWrapper[] = []
+
+        for (let i = 0; i < searchParam.length; i++) {
+            const e = searchParam[i];
+            e.trim();
+            searchArr.push(ilike(media.title, `%${e}%`))
+            searchArr.push(ilike(media.description, `%${e}%`))
+            searchArr.push(ilike(media.mediaFilePath, `%${e}%`))
+        }
 
         let sortBy: AnyColumn | SQLWrapper = media.mediaCreatedAt
         if (sortByParam == "size") {
@@ -28,9 +38,7 @@ export async function GET(
             beforeDateParam ? lt(media.mediaCreatedAt, beforeDateParam) : undefined,
             sizeParam ? lt(media.mediaSize, sizeParam) : undefined,
             or(
-                searchParam ? ilike(media.title, `%${searchParam}%`) : undefined,
-                searchParam ? ilike(media.description, `%${searchParam}%`) : undefined,
-                searchParam ? ilike(media.mediaFilePath, `%${searchParam}%`) : undefined,
+                ...searchArr,
             )
         )).limit(count ? +count : 10).offset(offset ? +offset : 0)
 
