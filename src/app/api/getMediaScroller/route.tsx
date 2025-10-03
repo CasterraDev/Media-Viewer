@@ -1,6 +1,6 @@
 import { db } from '@/db';
 import { media } from '@/db/schema';
-import { and, AnyColumn, asc, desc, gt, ilike, inArray, lt, or, SQLWrapper } from 'drizzle-orm';
+import { and, AnyColumn, asc, desc, gt, ilike, inArray, lt, or, sql, SQLWrapper } from 'drizzle-orm';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(
@@ -32,7 +32,7 @@ export async function GET(
             sortBy = media.mediaSize
         }
 
-        const medias = await db.select().from(media).orderBy(sortingParam?.match("descending") ? desc(sortBy) : asc(sortBy)).where(and(
+        const medias = await db.select().from(media).orderBy(sortingParam?.match("descending") ? desc(sortBy) : sortingParam?.match("random") ? sql`RANDOM()` : asc(sortBy)).where(and(
             mediaTypesParam ? inArray(media.mediaType, mediaTypesParam) : undefined,
             afterDateParam ? gt(media.mediaCreatedAt, afterDateParam) : undefined,
             beforeDateParam ? lt(media.mediaCreatedAt, beforeDateParam) : undefined,

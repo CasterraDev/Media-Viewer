@@ -56,7 +56,7 @@ export default function Search() {
                                 <DropdownMenuSeparator />
                                 <DropdownMenuRadioGroup value={filter.sorting.value} onValueChange={(e) => {filter.sorting.value = e as any; emptyMedia()}}
                                     className="border-1 border-[var(--color-foreground)] w-fit mx-auto bg-[var(--color-background)]">
-                                    {["ascending", "descending"].map((x) => (
+                                    {["ascending", "descending", "random"].map((x) => (
                                         <DropdownMenuRadioItem key={x} value={x}
                                             className="capitalize cursor-pointer text-center px-4 first-of-type:pt-2 last-of-type:pb-2
                                             hover:bg-[var(--color-foreground)] hover:text-[var(--color-background)]">
