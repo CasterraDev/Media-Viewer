@@ -84,7 +84,7 @@ export const getMedias = async (offset: number, limit: number, filter?: FilterPr
                 })
             }
             if (filter.search != ""){
-                let xs = filter.search.substring(filter.search.indexOf("{")+1)
+                let xs = filter.search.substring(filter.search.indexOf("}")+1)
                 params = params.concat(`&search=${encodeURI(xs)}`)
             }
         }
