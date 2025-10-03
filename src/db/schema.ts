@@ -25,7 +25,7 @@ export const media = pgTable("Media", {
     mediaCreatedAt: timestamp("media_created_at", { mode: "string" }).notNull(),
     mediaUpdatedAt: timestamp("media_updated_at", { mode: "string" }).notNull(),
     createdAt: timestamp("created_at", { mode: "string" }).notNull().defaultNow(),
-    updatedAt: timestamp("updated_at", { mode: "string" }).notNull().defaultNow().$onUpdate(() => new Date().toString()).notNull()
+    updatedAt: timestamp("updated_at", { mode: "string" }).notNull().defaultNow().$onUpdate(() => new Date().toISOString()).notNull()
 },
     (table) => ([
         index("media_title_idx").on(table.title),
@@ -42,7 +42,7 @@ export const album = pgTable("Album", {
     description: varchar("description", { length: 5000 }),
     thumbnailID: uuid().references(() => media.id),
     createdAt: timestamp("created_at", { mode: "string" }).notNull().defaultNow(),
-    updatedAt: timestamp("updated_at", { mode: "string" }).notNull().defaultNow().$onUpdate(() => new Date().toString()).notNull()
+    updatedAt: timestamp("updated_at", { mode: "string" }).notNull().defaultNow().$onUpdate(() => new Date().toISOString()).notNull()
 },
     (table) => ([
         index("album_title_idx").on(table.title),

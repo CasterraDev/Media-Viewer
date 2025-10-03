@@ -71,6 +71,13 @@
       "when": 1759306897281,
       "tag": "0009_cold_komodo",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1759476907472,
+      "tag": "0010_organic_corsair",
+      "breakpoints": true
     }
   ]
 }

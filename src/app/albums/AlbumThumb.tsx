@@ -25,6 +25,7 @@ import { MediaSizing } from "@/_types/type";
 import { useSignals } from "@preact/signals-react/runtime";
 import { useInView } from "react-intersection-observer";
 import { Show } from "@preact/signals-react/utils";
+import { changeAlbum } from "@/actions/changeAlbum";
 
 type AlbumThumbProps = {
     album: Album & { thumbnail: Media }
@@ -34,7 +35,6 @@ export default function AlbumThumb(props: AlbumThumbProps) {
     const [media, setMedia] = useState<Media | null>(null)
     useSignals();
     const { ref, inView } = useInView()
-    console.log("MediaScroll")
     const maxCols = 4
 
     async function loadMoreMedias() {
@@ -67,8 +67,15 @@ export default function AlbumThumb(props: AlbumThumbProps) {
         fun()
     }, [])
 
-    function submit(e: FormEvent<HTMLFormElement>) {
-        e.preventDefault();
+    async function submit(e: FormEvent<HTMLFormElement>) {
+        const formData = new FormData(e.currentTarget);
+        console.log(e.currentTarget.id);
+        formData.set("albumID", props.album.id)
+        for (const pair of formData.entries()) {
+            console.log(pair[0], pair[1]);
+        }
+
+        await changeAlbum(formData);
     }
 
     const dynaMedia = (): ReactNode => {
@@ -101,7 +108,7 @@ export default function AlbumThumb(props: AlbumThumbProps) {
         <div className="group flex flex-col w-fit h-fit">
             <div className="relative w-40 h-40">
                 <Dialog>
-                    <form className="w-fit absolute top-2 right-2">
+                    <form className="w-fit absolute top-2 right-2" onSubmit={submit} id="change-album-form">
                         <DialogTrigger asChild>
                             <button className="group-hover:block hidden z-10"><BsThreeDotsVertical /></button>
                         </DialogTrigger>
@@ -115,11 +122,11 @@ export default function AlbumThumb(props: AlbumThumbProps) {
                             <div className="grid gap-4">
                                 <div className="grid gap-3">
                                     <label htmlFor="title">Title</label>
-                                    <Input id="title" name="title" defaultValue={props.album.title || ""} />
+                                    <Input form="change-album-form" id="title" name="title" defaultValue={props.album.title || ""} />
                                 </div>
                                 <div className="grid gap-3">
                                     <label htmlFor="description">Description</label>
-                                    <Input id="description" name="description" defaultValue={props.album.description || ""} />
+                                    <Input form="change-album-form" id="description" name="description" defaultValue={props.album.description || ""} />
                                 </div>
                             </div>
                             <Dialog>
@@ -133,7 +140,7 @@ export default function AlbumThumb(props: AlbumThumbProps) {
                                     <div className="grid gap-4 scroll-auto max-h-[80vh]">
                                         <div className="grid gap-3">
                                             <label htmlFor="thumbnail">Media Thumbnail Src</label>
-                                            <Input id="thumbnail" name="thumbnail" defaultValue={props.album?.thumbnail?.mediaFilePath || ""} />
+                                            <Input form="change-album-form" id="thumbnail" name="thumbnail" defaultValue={props.album?.thumbnail?.mediaFilePath || ""} />
                                         </div>
                                         <div className="grid w-full h-fit grid-cols-2 max-h-4/5 overflow-scroll">
                                             {mediaList.value.map((m, i) => (
@@ -157,7 +164,7 @@ export default function AlbumThumb(props: AlbumThumbProps) {
                                 <DialogClose asChild>
                                     <Button variant="outline">Cancel</Button>
                                 </DialogClose>
-                                <Button type="submit">Save changes</Button>
+                                <Button form={"change-album-form"} type="submit">Save changes</Button>
                             </DialogFooter>
                         </DialogContent>
                     </form>
