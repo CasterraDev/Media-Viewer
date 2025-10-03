@@ -57,6 +57,20 @@
       "when": 1758913162902,
       "tag": "0007_clammy_tarot",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1759291960188,
+      "tag": "0008_ordinary_barracuda",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1759306897281,
+      "tag": "0009_cold_komodo",
+      "breakpoints": true
     }
   ]
 }

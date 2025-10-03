@@ -5,18 +5,15 @@ import { secsIntoHexidecmal } from "@/utils/clientUtil";
 import Image from "next/image";
 import { ReactNode, useState } from "react"
 import { FaPlay } from "react-icons/fa6";
-import { mediaPresentIdx } from "@/utils/signals";
 
 type MediaShowType = {
     media: Media
     idx: number
     dimensionType: MediaSizing
     sizeScale?: number
+    onClick?: (idx: number) => void
 }
 
-function mediaClick(idx: number) {
-    mediaPresentIdx.value = idx;
-}
 
 export default function MediaShow(props: MediaShowType) {
     const [media, _setMedia] = useState<Media>(props.media);
@@ -25,7 +22,7 @@ export default function MediaShow(props: MediaShowType) {
         if (!media) return;
         if (media.mediaType.includes("photos")) {
             return (
-                <button className="relative w-full h-fit" onClick={() => mediaClick(props.idx)}>
+                <button className="relative w-full h-fit" onClick={() => {if (props.onClick) props.onClick(props.idx)}}>
                     <Image
                         alt={`${media.title || media.mediaFilename}`}
                         src={`/api/getMedia?mediaID=${media.id}`}
@@ -42,8 +39,8 @@ export default function MediaShow(props: MediaShowType) {
         } else {
             return (
                 <button
-                    className="relative w-full h-fit" onClick={() => mediaClick(props.idx)}>
-                    <video preload="metadata">
+                    className="relative w-full h-fit" onClick={() => {if (props.onClick) props.onClick(props.idx)}}>
+                    <video preload="metadata" playsInline={true}>
                         <source src={`/api/getMedia?mediaID=${media.id}`} />
                     </video>
                     <div className="absolute top-0 right-0 z-10 m-1 flex flex-row gap-1">
@@ -56,11 +53,13 @@ export default function MediaShow(props: MediaShowType) {
     }
 
     return (
-        <div id={`Media-Show-${props.idx}`} className={`MediaShow ${MediaSizing[props.dimensionType]} w-full h-full`}>
-            {
-                dynaMedia()
-            }
-        </div>
+        <>
+            <div id={`Media-Show-${props.idx}`} className={`MediaShow ${MediaSizing[props.dimensionType]} w-full h-full`}>
+                {
+                    dynaMedia()
+                }
+            </div>
+        </>
     )
 }
 

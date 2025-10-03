@@ -12,6 +12,7 @@ export async function GET(
         const afterDateParam = req.nextUrl.searchParams.get("afterDate");
         const sortingParam = req.nextUrl.searchParams.get("sorting");
         const sortByParam = req.nextUrl.searchParams.get("sortBy");
+        const sizeParam = req.nextUrl.searchParams.get("size");
         const searchParam = req.nextUrl.searchParams.get("search");
         const count = req.nextUrl.searchParams.get("count");
         const offset = req.nextUrl.searchParams.get("offset");
@@ -25,6 +26,7 @@ export async function GET(
             mediaTypesParam ? inArray(media.mediaType, mediaTypesParam) : undefined,
             afterDateParam ? gt(media.mediaCreatedAt, afterDateParam) : undefined,
             beforeDateParam ? lt(media.mediaCreatedAt, beforeDateParam) : undefined,
+            sizeParam ? lt(media.mediaSize, sizeParam) : undefined,
             or(
                 searchParam ? ilike(media.title, `%${searchParam}%`) : undefined,
                 searchParam ? ilike(media.description, `%${searchParam}%`) : undefined,

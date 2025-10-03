@@ -1,0 +1,2 @@
+ALTER TABLE "Album" ADD COLUMN "thumbnail" uuid;--> statement-breakpoint
+ALTER TABLE "Album" ADD CONSTRAINT "Album_thumbnail_Media_id_fk" FOREIGN KEY ("thumbnail") REFERENCES "public"."Media"("id") ON DELETE no action ON UPDATE no action;

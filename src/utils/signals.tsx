@@ -15,5 +15,6 @@ export const filter: Filter = {
     },
     sorting: signal("ascending"),
     sortBy: signal("created"),
-    search: signal("")
+    search: signal(""),
+    size: signal("")
 }

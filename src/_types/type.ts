@@ -1,5 +1,11 @@
 import { Signal } from "@preact/signals-react"
 
+export type CreateAlbumAPIPOST = {
+    title: string
+    description: string
+    mediaIDs: string[]
+}
+
 export type MediaJsonRes = {
     mediaRoot: string
     mediaDir: string
@@ -37,6 +43,7 @@ export type Filter = {
     sorting: Signal<"ascending" | "descending">
     sortBy: Signal<"created" | "size">
     search: Signal<string>
+    size: Signal<string>
 }
 
 export type FilterPrimative = {
@@ -47,4 +54,5 @@ export type FilterPrimative = {
     sorting: "ascending" | "descending"
     sortBy: "created" | "size"
     search: string
+    size: string
 }

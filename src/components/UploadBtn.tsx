@@ -48,8 +48,8 @@ export default function UploadBtn() {
                 <DropdownMenuContent>
                     <DropdownMenuLabel className="capitalize font-bold">Roots</DropdownMenuLabel>
                     <DropdownMenuSeparator />
-                    {settings.mediaRoots.map((r) => (
-                        <DropdownMenuItem className="cursor-pointer" onClick={(e) => click(e, [r])}>{r}</DropdownMenuItem>
+                    {settings.mediaRoots.map((r, i) => (
+                        <DropdownMenuItem key={i} className="cursor-pointer" onClick={(e) => click(e, [r])}>{r}</DropdownMenuItem>
                     ))}
                 </DropdownMenuContent>
             </DropdownMenu>

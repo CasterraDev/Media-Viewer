@@ -56,6 +56,9 @@ export const getMedias = async (offset: number, limit: number, filter?: FilterPr
             if (filter.sortBy) {
                 d["sortBy"] = filter.sortBy;
             }
+            if (filter.size) {
+                d["size"] = filter.size;
+            }
             if (filter.media.photos) {
                 pushDict(d, [], "mediaTypes", "photos");
             }
@@ -71,6 +74,9 @@ export const getMedias = async (offset: number, limit: number, filter?: FilterPr
             }
             if (d["sortBy"]) {
                 params = params.concat(`&sortBy=${d["sortBy"]}`)
+            }
+            if (d["size"]){
+                params = params.concat(`&size=${d["size"]}`)
             }
             if (d["mediaTypes"] && Array.isArray(d["mediaTypes"])) {
                 d["mediaTypes"].map((x) => {
@@ -90,6 +96,17 @@ export const getMedias = async (offset: number, limit: number, filter?: FilterPr
         const response = await fetch(`http://localhost:3000/api/getMediaScroller?${params}`)
         const data = (await response.json())
         return data.medias
+    } catch (error: unknown) {
+        console.log(error)
+        throw new Error(`An error happened: ${error}`)
+    }
+}
+
+export const getMedia = async (id: string) => {
+    try {
+        const response = await fetch(`http://localhost:3000/api/getMedia?mediaID=${id}`)
+        const data = (await response.json())
+        return data
     } catch (error: unknown) {
         console.log(error)
         throw new Error(`An error happened: ${error}`)

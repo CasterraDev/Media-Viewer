@@ -16,22 +16,23 @@ function close() {
     mediaPresentIdx.value = null
 }
 
-function changeMedia(side: number, idx: number) {
-    if ((side == -1 || !side) && idx > 0) {
-        mediaPresentIdx.value = idx - 1;
-    } else {
-        if (idx < mediaList.value.length - 1) {
-            mediaPresentIdx.value = idx + 1;
-        }
-    }
-    document.getElementById(`Media-Show-${mediaPresentIdx}`)?.scrollIntoView();
-}
 
-export default function MediaPresent({ mediaIdx }: { mediaIdx: number }) {
-    let m = mediaList.value[mediaIdx]
+export default function MediaPresent({ media, mediaIdx }: { media: Media, mediaIdx: number }) {
+    let m = media
     const { userPrefs, updateUserPrefs } = useUserPrefs("settings");
     const [loop, setLoop] = useState<boolean>(userPrefs.mediaLoop);
     const [autoplay, setAutoplay] = useState<boolean>(userPrefs.mediaAutoplay);
+
+    function changeMedia(side: number, idx: number) {
+        if ((side == -1 || !side) && idx > 0) {
+            mediaPresentIdx.value = idx - 1;
+        } else {
+            if (idx < mediaList.value.length - 1) {
+                mediaPresentIdx.value = idx + 1;
+            }
+        }
+        document.getElementById(`Media-Show-${mediaPresentIdx}`)?.scrollIntoView();
+    }
 
     const dynaMedia = (m: Media): ReactNode => {
         if (!m) return;
@@ -61,16 +62,15 @@ export default function MediaPresent({ mediaIdx }: { mediaIdx: number }) {
         }
     }
 
-
     function keyDownHandler(e: KeyboardEvent) {
         if (e.code == 'Escape' || e.code == 'ControlRight') {
             close()
         } else if (e.code == 'ArrowRight') {
-            if (mediaPresentIdx.value) {
+            if (mediaPresentIdx.value != null) {
                 changeMedia(1, mediaPresentIdx.value)
             }
         } else if (e.code == 'ArrowLeft') {
-            if (mediaPresentIdx.value) {
+            if (mediaPresentIdx.value != null) {
                 changeMedia(-1, mediaPresentIdx.value)
             }
         } else if (e.code == 'KeyL') {
@@ -93,7 +93,7 @@ export default function MediaPresent({ mediaIdx }: { mediaIdx: number }) {
     }, [])
 
     useEffect(() => {
-        updateUserPrefs({mediaLoop: loop, mediaAutoplay: autoplay})
+        updateUserPrefs({ mediaLoop: loop, mediaAutoplay: autoplay })
     }, [loop, autoplay])
 
     return (

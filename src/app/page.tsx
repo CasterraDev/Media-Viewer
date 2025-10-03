@@ -1,10 +1,10 @@
-import MediaScroll from "@/components/MediaScroll";
+import MediaLoader from "@/components/MediaLoader";
 
 export default function Home() {
     console.log("Home")
     return (
         <div className="flex flex-col">
-            <MediaScroll />
+            <MediaLoader sizeScale={.20}/>
         </div>
     );
 }
