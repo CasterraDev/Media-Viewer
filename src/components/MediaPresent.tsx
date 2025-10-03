@@ -9,6 +9,8 @@ import Image from "next/image";
 import { IoIosArrowDropleft, IoIosArrowDropright } from "react-icons/io";
 import { MdOutlineLoop } from "react-icons/md";
 import useUserPrefs from "@/hooks/useUserPrefs"
+import { getMediaSizing } from "@/utils/clientUtil"
+import { MediaSizing } from "@/_types/type"
 
 function close() {
     document.body.classList.remove("overflow-x-hidden")
@@ -36,20 +38,22 @@ export default function MediaPresent({ media, mediaIdx }: { media: Media, mediaI
 
     const dynaMedia = (m: Media): ReactNode => {
         if (!m) return;
+        const sizing = getMediaSizing(m.mediaWidth, m.mediaHeight);
         if (m.mediaType.includes("photos")) {
             return (
-                <div className="w-full h-full">
+                <div className="w-full h-full flex items-center">
                     <Image
                         alt={`${m.title || m.mediaFilename}`}
                         src={`/api/getMedia?mediaID=${m.id}`}
                         sizes={"100vw"}
                         style={{
-                            width: 'auto',
-                            height: '100%',
+                            width: sizing == MediaSizing.portrait ? "auto" : sizing == MediaSizing.landscape ? "100%" : "auto",
+                            height: sizing == MediaSizing.portrait ? "100%" : sizing == MediaSizing.landscape ? "auto" : "100%",
                         }}
                         width={500}
                         height={300}
                         className="mx-auto"
+                        quality={100}
                     />
                 </div>
             )

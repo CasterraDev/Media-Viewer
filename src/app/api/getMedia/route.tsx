@@ -27,7 +27,7 @@ export async function GET(
                 'Content-Length': m.mediaSize,
                 'Content-Type': m.mediaType,
                 'Accept-Ranges': 'bytes',
-                'Content-Disposition': `inline; filename=${m.mediaFilename}`
+                'Content-Disposition': `inline; filename=${encodeURIComponent(m.mediaFilename)}`
             });
 
             return new Response(streamFile(mediaFilePath), { status: 200, headers });
