@@ -46,6 +46,7 @@ export default function MediaPresent({ media, mediaIdx }: { media: Media, mediaI
                         alt={`${m.title || m.mediaFilename}`}
                         src={`/api/getMedia?mediaID=${m.id}`}
                         sizes={"100vw"}
+                        unoptimized
                         style={{
                             width: sizing == MediaSizing.portrait ? "auto" : sizing == MediaSizing.landscape ? "100%" : "auto",
                             height: sizing == MediaSizing.portrait ? "100%" : sizing == MediaSizing.landscape ? "auto" : "100%",
