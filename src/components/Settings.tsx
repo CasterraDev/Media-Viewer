@@ -4,12 +4,14 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import useUserPrefs from "@/hooks/useUserPrefs"
 import { XIcon } from "lucide-react";
+import { FaChevronUp, FaChevronDown } from "react-icons/fa";
 import { FormEvent, useEffect, useRef, useState } from "react";
 import UploadBtn from "./UploadBtn";
 import DataChanger from "./DataChanger";
 
 export default function Settings() {
     const [roots, setRoots] = useState<string[]>([])
+    const [dataChangerOpen, setDataChangerOpen] = useState<boolean>(false)
     const { userPrefs: settings, updateUserPrefs: setSettings } = useUserPrefs("settings");
     const newRootRef = useRef<HTMLInputElement>(null)
 
@@ -21,22 +23,22 @@ export default function Settings() {
         for (const pair of formData.entries()) {
             console.log(pair[0], pair[1]);
             const st = pair[1].toString()
-            if (pair[0].toString().includes("root") && st !== ""){
+            if (pair[0].toString().includes("root") && st !== "") {
                 newRoots.push(st)
             }
         }
-        setSettings({mediaRoots: newRoots})
+        setSettings({ mediaRoots: newRoots })
     }
 
-    function remove(i: number){
+    function remove(i: number) {
         let r = roots;
         r.splice(i, 1);
-        setSettings({mediaRoots: r});
+        setSettings({ mediaRoots: r });
     }
 
     useEffect(() => {
         setRoots(settings.mediaRoots);
-        if (newRootRef.current){
+        if (newRootRef.current) {
             newRootRef.current.value = "";
         }
     }, [settings])
@@ -47,7 +49,7 @@ export default function Settings() {
                 <label className="text-lg">Media Roots</label>
                 {roots.map((r: string, i: number) => (
                     <div className="flex flex-row gap-3" key={i}>
-                        <Input placeholder={r} defaultValue={r} name={`root-${i}`}/>
+                        <Input placeholder={r} defaultValue={r} name={`root-${i}`} />
                         <Button type="button" className="cursor-pointer" onClick={() => remove(i)}><XIcon /></Button>
                     </div>
                 ))}
@@ -56,10 +58,18 @@ export default function Settings() {
             </form>
 
             <div className="w-fit h-auto ml-auto">
-                <UploadBtn roots={settings.mediaRoots}/>
+                <UploadBtn roots={settings.mediaRoots} />
             </div>
 
-            <DataChanger />
+            <div>
+                <button onClick={() => setDataChangerOpen(prev => !prev)}
+                    className="text-2xl font-bold underline w-full p-2 rounded-2xl hover:bg-foreground/20 flex flex-row justify-center items-center gap-3">
+                    Data Changer {dataChangerOpen ? <FaChevronUp className="p-1 my-auto"/> : <FaChevronDown className="p-1 my-auto"/>}
+                </button>
+                {dataChangerOpen &&
+                    <DataChanger withoutHeader={true} />
+                }
+            </div>
         </div>
     )
 }

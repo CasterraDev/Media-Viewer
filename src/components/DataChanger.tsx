@@ -8,8 +8,9 @@ import { Button } from "./ui/button";
 
 export default function DataChanger({
     className,
+    withoutHeader = false,
     ...props
-}: React.ComponentProps<"div">) {
+}: React.ComponentProps<"div"> & { withoutHeader?: boolean }) {
 
     async function submit(e: FormEvent<HTMLFormElement>) {
         e.preventDefault();
@@ -21,7 +22,9 @@ export default function DataChanger({
     return (
         <div {...props}
             className={cn(className, "w-full h-full")}>
-            <h1 className="text-2xl underline">Data Changer</h1>
+            {!withoutHeader &&
+                <h1 className="text-2xl font-bold underline">Data Changer</h1>
+            }
             <form className="flex flex-col gap-5" onSubmit={submit}>
                 <div className="flex flex-col">
                     <label htmlFor="mediaRoot" className="flex flex-row gap-5 items-center">Match Root<p className="text-center my-auto text-xs text-gray-200">End with a /</p></label>
