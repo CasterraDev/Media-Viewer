@@ -6,6 +6,7 @@ import useUserPrefs from "@/hooks/useUserPrefs"
 import { XIcon } from "lucide-react";
 import { FormEvent, useEffect, useRef, useState } from "react";
 import UploadBtn from "./UploadBtn";
+import DataChanger from "./DataChanger";
 
 export default function Settings() {
     const [roots, setRoots] = useState<string[]>([])
@@ -55,8 +56,10 @@ export default function Settings() {
             </form>
 
             <div className="w-fit h-auto ml-auto">
-                <UploadBtn />
+                <UploadBtn roots={settings.mediaRoots}/>
             </div>
+
+            <DataChanger />
         </div>
     )
 }

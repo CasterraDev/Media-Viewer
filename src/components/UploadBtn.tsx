@@ -13,16 +13,15 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { UserPrefs } from "@/_types/type";
 
-export default function UploadBtn() {
+export default function UploadBtn({roots}: {roots: string[]}) {
     const [uploading, setUploading] = useState<boolean>(false)
-    const { userPrefs, updateUserPrefs: _ } = useUserPrefs("settings");
-    const [settings, setSettings] = useState<UserPrefs>(userPrefs)
 
-    const click = async (_event: any, roots: string[] = userPrefs.mediaRoots) => {
+    const click = async (_event: any, rootsList: string[] = roots) => {
         setUploading(true);
         console.log("Uploading dir")
+        console.log(rootsList);
         const body = {
-            mediaRoots: roots
+            mediaRoots: rootsList
         }
 
         const res = await fetch("/api/uploadFilesToDb", {
@@ -35,10 +34,6 @@ export default function UploadBtn() {
         setUploading(false);
     }
 
-    useEffect(() => {
-        setSettings(userPrefs)
-    }, [userPrefs])
-
     return (
         <div className="w-full h-full flex flex-row border-[1.5px] border-[var(--color-foreground)] rounded-lg">
             <button disabled={uploading} onClick={(e) => click(e)} className=" rounded-bl-lg rounded-tl-lg cursor-pointer border-white p-2 hover:bg-[var(--color-foreground)] hover:text-[var(--color-background)]">Upload</button>
@@ -48,7 +43,7 @@ export default function UploadBtn() {
                 <DropdownMenuContent>
                     <DropdownMenuLabel className="capitalize font-bold">Roots</DropdownMenuLabel>
                     <DropdownMenuSeparator />
-                    {settings.mediaRoots.map((r, i) => (
+                    {roots.map((r, i) => (
                         <DropdownMenuItem key={i} className="cursor-pointer" onClick={(e) => click(e, [r])}>{r}</DropdownMenuItem>
                     ))}
                 </DropdownMenuContent>

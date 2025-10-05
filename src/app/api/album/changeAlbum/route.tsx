@@ -1,4 +1,3 @@
-import { CreateAlbumAPIPOST } from '@/_types/type';
 import { db } from '@/db';
 import { album, media, mediasToAlbums } from '@/db/schema';
 import { NextRequest, NextResponse } from 'next/server';

@@ -5,7 +5,8 @@ import { readdirSync } from 'fs';
 import { stat } from 'fs/promises';
 import { NextRequest, NextResponse } from 'next/server';
 import path from 'path';
-var mime = require("mime-types");
+import mime from 'mime';
+import { fileTypeFromFile } from 'file-type'
 import { imageSizeFromFile } from 'image-size/fromFile'
 import { getType, getVideoData } from '@/utils/util';
 import { MediaType } from '@/_types/type';
@@ -13,7 +14,7 @@ import { MediaType } from '@/_types/type';
 const uploadFiles = async (filepath: string, mediaRoot: string): Promise<number> => {
     return new Promise((resolve, reject) => {
         let newFiles = 0;
-        let mt: { name: string, type: string } = { name: "", type: "" }
+        let mimeType: string | undefined = undefined;
         readdirSync(filepath).forEach(async (file) => {
             try {
                 // TODO: Check the dir and/or root so we aren't querying every file
@@ -46,14 +47,12 @@ const uploadFiles = async (filepath: string, mediaRoot: string): Promise<number>
                         return;
                     }
 
-                    const mimeType: string = mime.lookup(file)
+                    mimeType = (await fileTypeFromFile(filename))?.mime
+                    console.log(file + ", " + mimeType)
                     // Return if file is not supported
-                    if (mimeType.includes("json")) {
+                    if (!mimeType || mimeType.includes("json")) {
                         return
                     }
-                    mt.name = file;
-                    mt.type = mimeType;
-                    console.log(`MT: ${mt.name}, ${mt.type}`)
 
                     const type = getType(mimeType)
                     let width = 0, height = 0, duration: number | null = null;
@@ -89,8 +88,8 @@ const uploadFiles = async (filepath: string, mediaRoot: string): Promise<number>
                     await db.insert(media).values(m)
                 }
             } catch (error) {
-                console.log(`Error Occurred: ${error} File: ${file} MT: ${mt.name}, ${mt.type}`)
-                reject(`Error Occurred: ${error} File: ${file} MT: ${mt.name}, ${mt.type}`);
+                console.log(`Error Occurred: ${error} File: ${file} MT: ${mimeType}`)
+                reject(`Error Occurred: ${error} File: ${file} MT: ${mimeType}`);
             }
         })
         resolve(newFiles);
@@ -106,6 +105,7 @@ export async function POST(
         if (!mediaRoots) throw new Error("No media roots passed.")
 
         mediaRoots.map(async (m) => {
+            console.log("Root: " + m)
             await uploadFiles(m, m);
         })
 
