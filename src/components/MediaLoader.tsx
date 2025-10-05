@@ -69,7 +69,8 @@ export default function MediaLoader(props: MediaLoaderType) {
                 style={{ "gridTemplateColumns": `repeat(${props.gridCols || 4}, minmax(0, 1fr))` }}>
                 {mediaList.value.map((m, i) => (
                     <Suspense key={`Media-Loader-${m.id}-${i}`}>
-                        <MediaShow media={m} idx={i} dimensionType={getMediaSizing(m.mediaWidth, m.mediaHeight)} sizeScale={props.sizeScale} onClick={mediaClick} />
+                        <MediaShow media={m} idx={i} dimensionType={getMediaSizing(m.mediaWidth, m.mediaHeight)}
+                            sizeScale={props.sizeScale} onClick={mediaClick} />
                     </Suspense>
                 ))}
             </div>

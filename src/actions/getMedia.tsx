@@ -50,6 +50,7 @@ export const getMedias = async (offset: number, limit: number, filter?: FilterPr
         let d: { [id: string]: string | string[] } = {}
         let params = `offset=${offset}&limit=${limit}`
         if (filter) {
+            // Set the filter up with the UI settings
             if (filter.sorting) {
                 d["sorting"] =  filter.sorting;
             }
@@ -65,10 +66,14 @@ export const getMedias = async (offset: number, limit: number, filter?: FilterPr
             if (filter.media.videos) {
                 pushDict(d, [], "mediaTypes", "videos");
             }
+
+            // parseSearch is going to overwrite some of the settings.
+            // search filters take percedence over UI
             if (filter.search != "") {
                 d = parseSearch(filter.search, d);
             }
 
+            // If it exists add it to the api string
             if (d["sorting"]) {
                 params = params.concat(`&sorting=${d["sorting"]}`)
             }
@@ -84,7 +89,9 @@ export const getMedias = async (offset: number, limit: number, filter?: FilterPr
                 })
             }
             if (filter.search != ""){
+                // Cut off the filter inside of search
                 let xs = filter.search.substring(filter.search.indexOf("}")+1)
+                // Split search by '+' seperator so you can search multiple things
                 let xsa: string[] = xs.split(' + ').map((y) => y.trim())
                 for (let i = 0; i < xsa.length; i++) {
                     const e = xsa[i];

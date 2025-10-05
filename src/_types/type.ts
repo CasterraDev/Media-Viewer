@@ -1,11 +1,5 @@
 import { Signal } from "@preact/signals-react"
 
-export type CreateAlbumAPIPOST = {
-    title: string
-    description: string
-    mediaIDs: string[]
-}
-
 export type MediaJsonRes = {
     mediaRoot: string
     mediaDir: string
@@ -27,10 +21,10 @@ export enum MediaType {
 }
 
 export type UserPrefs = {
-  sortType: string,
-  mediaRoots: string[],
-  mediaLoop: boolean,
-  mediaAutoplay: boolean
+    sortType: string,
+    mediaRoots: string[],
+    mediaLoop: boolean,
+    mediaAutoplay: boolean
 }
 
 export type MediaTypes = {
@@ -38,10 +32,21 @@ export type MediaTypes = {
     videos: Signal<boolean>
 }
 
+export type FilterSorting = "ascending" | "descending" | "random"
+export type FilterSortBy = "created" | "size"
+
+export enum FilterSortingEnum {
+    "ascending", "descending", "random"
+}
+
+export enum FilterSortByEnum {
+    "created", "size"
+}
+
 export type Filter = {
     media: MediaTypes,
-    sorting: Signal<"ascending" | "descending" | "random">
-    sortBy: Signal<"created" | "size">
+    sorting: Signal<FilterSorting>
+    sortBy: Signal<FilterSortBy>
     search: Signal<string>
     size: Signal<string>
 }
@@ -51,8 +56,8 @@ export type FilterPrimative = {
         photos: boolean,
         videos: boolean
     },
-    sorting: "ascending" | "descending" | "random"
-    sortBy: "created" | "size"
+    sorting: FilterSorting
+    sortBy: FilterSortBy
     search: string
     size: string
 }

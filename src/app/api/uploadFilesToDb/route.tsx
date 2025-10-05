@@ -5,7 +5,6 @@ import { readdirSync } from 'fs';
 import { stat } from 'fs/promises';
 import { NextRequest, NextResponse } from 'next/server';
 import path from 'path';
-import mime from 'mime';
 import { fileTypeFromFile } from 'file-type'
 import { imageSizeFromFile } from 'image-size/fromFile'
 import { getType, getVideoData } from '@/utils/util';
@@ -17,8 +16,6 @@ const uploadFiles = async (filepath: string, mediaRoot: string): Promise<number>
         let mimeType: string | undefined = undefined;
         readdirSync(filepath).forEach(async (file) => {
             try {
-                // TODO: Check the dir and/or root so we aren't querying every file
-                console.log(file);
                 const root = mediaRoot.endsWith('/') ? mediaRoot : mediaRoot + '/'
                 const filename = filepath + "/" + file;
 
@@ -51,6 +48,7 @@ const uploadFiles = async (filepath: string, mediaRoot: string): Promise<number>
                     console.log(file + ", " + mimeType)
                     // Return if file is not supported
                     if (!mimeType || mimeType.includes("json")) {
+                        console.error("File type not supported: File: " + file + " Mime: " + mimeType)
                         return
                     }
 
@@ -109,7 +107,7 @@ export async function POST(
             await uploadFiles(m, m);
         })
 
-        return NextResponse.json({}, { status: 200 });
+        return new Response('Success', { status: 200 });
     } catch (err: unknown) {
         console.error(`Error processing request: ${err}`);
         return new Response(`Internal server error: ${err}`, { status: 500 });

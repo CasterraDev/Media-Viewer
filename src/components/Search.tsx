@@ -3,6 +3,7 @@
 import { Button } from "./ui/button"
 import { Input } from "./ui/input"
 import { FaCheck, FaMagnifyingGlass, FaX } from "react-icons/fa6";
+import { FaFilter } from "react-icons/fa";
 import {
     Dialog,
     DialogContent,
@@ -14,6 +15,7 @@ import { filter, mediaNotFinished, mediaList, mediaOffset } from "@/utils/signal
 import { useSignals } from "@preact/signals-react/runtime";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuSeparator, DropdownMenuTrigger, Separator } from "@radix-ui/react-dropdown-menu";
 import { FormEvent } from "react";
+import { FilterSortByEnum, FilterSorting, FilterSortingEnum } from "@/_types/type";
 
 function emptyMedia() {
     mediaNotFinished.value = true
@@ -41,7 +43,7 @@ export default function Search() {
     return (
         <form className="flex flex-row gap-1 w-full" onSubmit={submit}>
             <Dialog>
-                <DialogTrigger>Filter</DialogTrigger>
+                <DialogTrigger><FaFilter /></DialogTrigger>
                 <DialogContent aria-describedby="Filter">
                     <DialogHeader>
                         <DialogTitle>Filter Options</DialogTitle>
@@ -56,7 +58,7 @@ export default function Search() {
                                 <DropdownMenuSeparator />
                                 <DropdownMenuRadioGroup value={filter.sorting.value} onValueChange={(e) => {filter.sorting.value = e as any; emptyMedia()}}
                                     className="border-1 border-[var(--color-foreground)] w-fit mx-auto bg-[var(--color-background)]">
-                                    {["ascending", "descending", "random"].map((x) => (
+                                    {(Object.keys(FilterSortingEnum) as Array<keyof typeof FilterSortingEnum>).filter((key) => Number.isNaN(+key)).map((x) => (
                                         <DropdownMenuRadioItem key={x} value={x}
                                             className="capitalize cursor-pointer text-center px-4 first-of-type:pt-2 last-of-type:pb-2
                                             hover:bg-[var(--color-foreground)] hover:text-[var(--color-background)]">
@@ -75,7 +77,7 @@ export default function Search() {
                                 <DropdownMenuSeparator />
                                 <DropdownMenuRadioGroup value={filter.sortBy.value} onValueChange={(e) => {filter.sortBy.value = e as any; emptyMedia()}}
                                     className="border-1 border-[var(--color-foreground)] w-fit mx-auto bg-[var(--color-background)]">
-                                    {["created", "size"].map((x) => (
+                                    {(Object.keys(FilterSortByEnum) as Array<keyof typeof FilterSortByEnum>).filter((key) => Number.isNaN(+key)).map((x) => (
                                         <DropdownMenuRadioItem key={x} value={x}
                                             className="capitalize cursor-pointer text-center px-4 first-of-type:pt-2 last-of-type:pb-2
                                             hover:bg-[var(--color-foreground)] hover:text-[var(--color-background)]">
