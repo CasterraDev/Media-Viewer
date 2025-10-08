@@ -41,6 +41,11 @@ export default function Topbar() {
                                 Albums
                             </Link>
                         </SheetClose>
+                        <SheetClose asChild>
+                            <Link href="/inline">
+                                Inline
+                            </Link>
+                        </SheetClose>
                     </div>
                 </SheetContent>
             </Sheet>

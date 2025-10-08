@@ -6,8 +6,12 @@ const nextConfig: NextConfig = {
       {
         pathname: '/api/getMedia**',
       },
+      {
+        pathname: '/api/getFileStream**',
+      },
     ],
     formats: ['image/webp'],
+    qualities: [100, 75, 50, 25]
   },
 };
 

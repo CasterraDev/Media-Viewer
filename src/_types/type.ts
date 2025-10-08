@@ -1,5 +1,14 @@
 import { Signal } from "@preact/signals-react"
 
+export type FileData = {
+    filePath: string,
+    stats: string,
+    mimeType: string,
+    type: string,
+    width: number,
+    height: number
+}
+
 export type MediaJsonRes = {
     mediaRoot: string
     mediaDir: string
