@@ -21,7 +21,7 @@ export default function FileShow(props: MediaShowType) {
                 <button className="relative w-full h-fit" onClick={() => {if (props.onClick) props.onClick(props.idx)}}>
                     <Image
                         alt={`${props.fileData.filePath}`}
-                        src={`/api/getFileStream?filePath=${props.fileData.filePath}`}
+                        src={`/api/getFileStream?filePath=${encodeURI(props.fileData.filePath)}`}
                         sizes={props.sizeScale ? `calc(100vw * ${props.sizeScale})` : "100vw"}
                         style={{
                             width: '100%',
@@ -37,7 +37,7 @@ export default function FileShow(props: MediaShowType) {
                 <button
                     className="relative w-full h-fit" onClick={() => {if (props.onClick) props.onClick(props.idx)}}>
                     <video preload="metadata" playsInline={true}>
-                        <source src={`/api/getFileStream?filePath=${props.fileData.filePath}`} />
+                        <source src={`/api/getFileStream?filePath=${encodeURI(props.fileData.filePath)}`} />
                     </video>
                     <div className="absolute top-0 right-0 z-10 m-1 flex flex-row gap-1">
                         <FaPlay className="m-auto" />
