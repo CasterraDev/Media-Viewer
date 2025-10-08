@@ -3,7 +3,7 @@
 import { mediaList, mediaPresentIdx } from "@/utils/signals"
 import { ReactNode, useEffect, useRef, useState } from "react"
 import { Button } from "./ui/button"
-import { FaPlay, FaX } from "react-icons/fa6"
+import { FaInfo, FaPlay, FaX } from "react-icons/fa6"
 import { Media } from "@/db/types"
 import Image from "next/image";
 import { IoIosArrowDropleft, IoIosArrowDropright } from "react-icons/io";
@@ -11,6 +11,10 @@ import { MdOutlineLoop } from "react-icons/md";
 import useUserPrefs from "@/hooks/useUserPrefs"
 import { getMediaSizing } from "@/utils/clientUtil"
 import { MediaSizing } from "@/_types/type"
+import { GoFileDirectory } from "react-icons/go";
+import { FaRegFile } from "react-icons/fa6";
+import { FaRegImage } from "react-icons/fa";
+import Link from "next/link"
 
 function close() {
     document.body.classList.remove("overflow-x-hidden")
@@ -20,8 +24,8 @@ function close() {
 
 
 export default function MediaPresent({ media, mediaIdx }: { media: Media, mediaIdx: number }) {
-    let m = media
     const { userPrefs, updateUserPrefs } = useUserPrefs("settings");
+    const [info, setInfo] = useState<boolean>(false);
     const [loop, setLoop] = useState<boolean>(userPrefs.mediaLoop);
     const [autoplay, setAutoplay] = useState<boolean>(userPrefs.mediaAutoplay);
     const [hideControls, setHideControls] = useState<boolean>(false);
@@ -88,6 +92,8 @@ export default function MediaPresent({ media, mediaIdx }: { media: Media, mediaI
             setAutoplay(prev => !prev);
         } else if (e.code == 'KeyH') {
             setHideControls(prev => !prev);
+        } else if (e.code == 'KeyI') {
+            setInfo(prev => !prev);
         }
         console.log(e.code)
     }
@@ -113,6 +119,9 @@ export default function MediaPresent({ media, mediaIdx }: { media: Media, mediaI
                 <div className="absolute w-full h-15 flex flex-row-reverse items-center gap-4 px-4 z-50!">
                     <>
                         <Button className="hover:bg-secondary" variant={"secondary"} onClick={close}><FaX /></Button>
+                        <Button variant={"secondary"} className="" onClick={() => setInfo(!info)}>
+                            <FaInfo className={`w-full h-auto ${info ? "text-site-accent" : ""}`} />
+                        </Button>
                         <Button variant={"secondary"} className="" onClick={() => setLoop(!loop)}>
                             <MdOutlineLoop className={`w-full h-auto ${loop ? "text-site-accent" : ""}`} />
                         </Button>
@@ -122,9 +131,32 @@ export default function MediaPresent({ media, mediaIdx }: { media: Media, mediaI
                     </>
                 </div>
             }
+            {info &&
+                <div className="absolute top-0 right-0 mt-15 w-90 h-[100vh] z-50 bg-background">
+                    <div className="flex flex-col gap-3 p-2 pl-5">
+                        <div className="flex flex-row gap-2">
+                            {media.title}
+                        </div>
+                        <div className="flex flex-row gap-2">
+                            <FaRegFile className={`w-auto h-full my-auto min-w-5`}/>
+                            <Link href={`/api/getMedia?mediaID=${media.id}`} rel="noopener noreferrer" target="_blank">
+                                {media.mediaFilename}
+                            </Link>
+                        </div>
+                        <div className="flex flex-row gap-2">
+                            <FaRegImage className={`w-auto h-full my-auto min-w-5`}/>
+                            {media.mediaWidth} x {media.mediaHeight}
+                        </div>
+                        <div className="flex flex-row gap-2">
+                            <GoFileDirectory className={`w-auto h-full min-w-6`}/>
+                            {media.mediaFilePath}
+                        </div>
+                    </div>
+                </div>
+            }
             <div className="w-full h-full p-10 py-0">
                 <button onClick={() => changeMedia(-1, mediaIdx)} className="fixed top-1/2 left-0 pl-2 w-10 aspect-square"><IoIosArrowDropleft className="w-full h-full hover:text-site-accent" /></button>
-                {dynaMedia(m)}
+                {dynaMedia(media)}
                 <button onClick={() => changeMedia(1, mediaIdx)} className="fixed top-1/2 right-0 pr-2 w-10 aspect-square"><IoIosArrowDropright className="w-full h-full hover:text-site-accent" /></button>
             </div>
         </div>
