@@ -1,6 +1,6 @@
 'use server'
 
-import { CreateAlbumAPIPOST } from "@/_types/type"
+import { CreateAlbumAPIPOST } from "@/_types/api"
 
 export const createAlbum = async ( a: Partial<CreateAlbumAPIPOST>) => {
     try {
