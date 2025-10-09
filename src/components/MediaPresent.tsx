@@ -4,7 +4,7 @@ import { mediaList, mediaPresentIdx } from "@/utils/signals"
 import { ReactNode, useEffect, useRef, useState } from "react"
 import { Button } from "./ui/button"
 import { FaInfo, FaPlay, FaX } from "react-icons/fa6"
-import { Media } from "@/db/types"
+import { Album, Media, MediaAlbums } from "@/db/types"
 import Image from "next/image";
 import { IoIosArrowDropleft, IoIosArrowDropright } from "react-icons/io";
 import { MdOutlineLoop } from "react-icons/md";
@@ -15,6 +15,23 @@ import { GoFileDirectory } from "react-icons/go";
 import { FaRegFile } from "react-icons/fa6";
 import { FaRegImage } from "react-icons/fa";
 import Link from "next/link"
+import { setMediasToAlbum } from "@/actions/setMediasToAlbum"
+import {
+    Command,
+    CommandEmpty,
+    CommandGroup,
+    CommandInput,
+    CommandItem,
+    CommandList,
+} from "@/components/ui/command"
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "@/components/ui/popover"
+import { RiExpandUpDownLine } from "react-icons/ri";
+import { useRouter } from "next/navigation"
+import { LuAlbum } from "react-icons/lu";
 
 function close() {
     document.body.classList.remove("overflow-x-hidden")
@@ -23,13 +40,18 @@ function close() {
 }
 
 
-export default function MediaPresent({ media, mediaIdx }: { media: Media, mediaIdx: number }) {
+export default function MediaPresent({ mediaAlbums, mediaIdx, allAlbums }: { mediaAlbums: MediaAlbums, mediaIdx: number, allAlbums?: Album[] }) {
+    const media = mediaAlbums
+    console.log(mediaAlbums);
     const { userPrefs, updateUserPrefs } = useUserPrefs("settings");
+    const [albumComboboxOpen, setAlbumComboboxOpen] = useState<boolean>(false);
     const [info, setInfo] = useState<boolean>(false);
     const [loop, setLoop] = useState<boolean>(userPrefs.mediaLoop);
     const [autoplay, setAutoplay] = useState<boolean>(userPrefs.mediaAutoplay);
     const [hideControls, setHideControls] = useState<boolean>(false);
     const ref = useRef<HTMLDivElement>(null);
+    const [albumAddStatusDisabled, setAlbumAddStatusDisabled] = useState<boolean>(false);
+    const router = useRouter();
 
     function changeMedia(side: number, idx: number) {
         if ((side == -1 || !side) && idx > 0) {
@@ -113,6 +135,14 @@ export default function MediaPresent({ media, mediaIdx }: { media: Media, mediaI
         updateUserPrefs({ mediaLoop: loop, mediaAutoplay: autoplay })
     }, [loop, autoplay])
 
+    async function addMediaToAlbum(id: string) {
+        setAlbumAddStatusDisabled(true);
+        await setMediasToAlbum(id, [media.id]).finally(() => {
+            setAlbumAddStatusDisabled(false);
+            router.refresh();
+        });
+    }
+
     return (
         <div className="fixed w-[100vw] h-[100vh] bg-black/50 z-50 top-0 left-0 right-0 backdrop-blur-sm bottom-0">
             {!hideControls &&
@@ -138,19 +168,66 @@ export default function MediaPresent({ media, mediaIdx }: { media: Media, mediaI
                             {media.title}
                         </div>
                         <div className="flex flex-row gap-2">
-                            <FaRegFile className={`w-auto h-full my-auto min-w-5`}/>
+                            <FaRegFile className={`w-auto h-full my-auto min-w-5`} />
                             <Link href={`/api/getMedia?mediaID=${media.id}`} rel="noopener noreferrer" target="_blank">
                                 {media.mediaFilename}
                             </Link>
                         </div>
                         <div className="flex flex-row gap-2">
-                            <FaRegImage className={`w-auto h-full my-auto min-w-5`}/>
+                            <FaRegImage className={`w-auto h-full my-auto min-w-5`} />
                             {media.mediaWidth} x {media.mediaHeight}
                         </div>
                         <div className="flex flex-row gap-2">
-                            <GoFileDirectory className={`w-auto h-full min-w-6`}/>
+                            <GoFileDirectory className={`w-auto h-full min-w-6`} />
                             {media.mediaFilePath}
                         </div>
+                    </div>
+                    <div>
+                        {media.albums.length > 0 && media.albums.map((albums) => {
+                            let a = albums.album;
+                            return (
+                                <p className="flex flex-row gap-2" key={"Album-Present-Title-" + a.title + a.id}><LuAlbum className="w-auto h-auto" />{a.title}</p>
+                            )
+                        })}
+                        {allAlbums &&
+                            <Popover open={albumComboboxOpen} onOpenChange={setAlbumComboboxOpen}>
+                                <PopoverTrigger asChild>
+                                    <Button
+                                        variant="outline"
+                                        role="combobox"
+                                        aria-expanded={albumComboboxOpen}
+                                        className="w-[200px] justify-between"
+                                        disabled={albumAddStatusDisabled}
+                                    >
+                                        Select an Album
+                                        <RiExpandUpDownLine />
+                                    </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-[200px] p-0">
+                                    <Command>
+                                        <CommandInput placeholder="Search Albums..." className="h-9" />
+                                        <CommandList>
+                                            <CommandEmpty>No Albums found.</CommandEmpty>
+                                            <CommandGroup>
+                                                {allAlbums.map((album) => (
+                                                    <CommandItem
+                                                        key={album.title + album.id}
+                                                        value={album.title + album.id}
+                                                        onSelect={() => {
+                                                            addMediaToAlbum(album.id)
+                                                        }}
+                                                        className="cursor-pointer"
+                                                        disabled={albumAddStatusDisabled}
+                                                    >
+                                                        {album.title}
+                                                    </CommandItem>
+                                                ))}
+                                            </CommandGroup>
+                                        </CommandList>
+                                    </Command>
+                                </PopoverContent>
+                            </Popover>
+                        }
                     </div>
                 </div>
             }

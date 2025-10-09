@@ -1,6 +1,7 @@
 'use server'
 
 import { FilterPrimative } from "@/_types/type"
+import { MediaAlbums } from "@/db/types";
 
 function pushDict(d: { [id: string]: any }, defaultVal: any, k: string, v: any) {
     if (!d[k]) {
@@ -45,7 +46,7 @@ function parseSearch(s: string, d: { [id: string]: string | string[] }): { [id: 
     return d;
 }
 
-export const getMedias = async (offset: number, limit: number, filter?: FilterPrimative) => {
+export const getMedias = async (offset: number, limit: number, filter?: FilterPrimative): Promise<MediaAlbums[]> => {
     try {
         let d: { [id: string]: string | string[] } = {}
         let params = `offset=${offset}&limit=${limit}`
@@ -106,6 +107,7 @@ export const getMedias = async (offset: number, limit: number, filter?: FilterPr
         // console.log(filter)
         const response = await fetch(`http://localhost:3000/api/getMediaScroller?${params}`)
         const data = (await response.json())
+        console.log(data)
         return data.medias
     } catch (error: unknown) {
         console.log(error)

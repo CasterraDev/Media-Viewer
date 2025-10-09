@@ -4,13 +4,15 @@ import { getMedias } from "@/actions/getMedia";
 import { filterTypeToPrimative, getMediaSizing } from "@/utils/clientUtil";
 import { filter, mediaList, mediaNotFinished, mediaOffset, mediaPresentIdx } from "@/utils/signals";
 import { useSignals } from "@preact/signals-react/runtime";
-import { Suspense, useEffect } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useInView } from "react-intersection-observer";
 import { Button } from "./ui/button";
 import MediaShow from "./MediaShow";
 import { FilterPrimative } from "@/_types/type";
 import MediaPresent from "./MediaPresent";
 import { Show } from "@preact/signals-react/utils";
+import { Album } from "@/db/types";
+import { getAllAlbums } from "@/actions/getAllAlbums";
 
 type MediaLoaderType = {
     gridCols?: number
@@ -23,6 +25,7 @@ export default function MediaLoader(props: MediaLoaderType) {
     useSignals();
 
     const { ref, inView } = useInView()
+    const [allAlbums, setAllAlbums] = useState<Album[]>([])
 
     async function loadMoreMedias() {
         let f;
@@ -33,6 +36,7 @@ export default function MediaLoader(props: MediaLoaderType) {
             f = props.filter
         }
         const apiMedias = await getMedias(mediaOffset.value, mediaCnt, f)
+        console.log(apiMedias)
         if (apiMedias.length <= 0) {
             mediaNotFinished.value = false;
             return
@@ -48,6 +52,12 @@ export default function MediaLoader(props: MediaLoaderType) {
     }
 
     useEffect(() => {
+        async function fun() {
+            const x = await getAllAlbums();
+            setAllAlbums(x);
+        }
+        fun();
+
         if (props.reset) {
             emptyMedia();
         }
@@ -76,7 +86,7 @@ export default function MediaLoader(props: MediaLoaderType) {
             </div>
             {mediaPresentIdx.value != null &&
                 <Suspense>
-                    <MediaPresent media={mediaList.value[mediaPresentIdx.value]} mediaIdx={mediaPresentIdx.value} />
+                    <MediaPresent mediaAlbums={mediaList.value[mediaPresentIdx.value]} mediaIdx={mediaPresentIdx.value} allAlbums={allAlbums}/>
                 </Suspense>
             }
             <Show when={mediaNotFinished}>

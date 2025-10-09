@@ -33,7 +33,7 @@ export const media = pgTable("Media", {
 );
 
 export const mediaRelations = relations(media, ({ many }) => ({
-    mediasToAlbums: many(mediasToAlbums),
+    albums: many(mediasToAlbums),
 }));
 
 export const album = pgTable("Album", {
@@ -50,7 +50,7 @@ export const album = pgTable("Album", {
 );
 
 export const albumRelations = relations(album, ({ one, many }) => ({
-    mediasToAlbums: many(mediasToAlbums),
+    medias: many(mediasToAlbums),
     thumbnail: one(media, { fields: [album.thumbnailID], references: [media.id] })
 }));
 

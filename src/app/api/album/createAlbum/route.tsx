@@ -1,8 +1,8 @@
-import { CreateAlbumAPIPOST } from '@/_types/type';
 import { db } from '@/db';
 import { album, media, mediasToAlbums } from '@/db/schema';
 import { NextRequest, NextResponse } from 'next/server';
 import { inArray } from 'drizzle-orm';
+import { CreateAlbumAPIPOST } from '@/_types/api';
 
 export async function POST(
     req: NextRequest,

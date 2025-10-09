@@ -1,6 +1,6 @@
 import { db } from '@/db';
-import { media } from '@/db/schema';
-import { and, AnyColumn, asc, desc, gt, ilike, inArray, lt, or, sql, SQLWrapper } from 'drizzle-orm';
+import { album, media, mediasToAlbums } from '@/db/schema';
+import { and, AnyColumn, asc, desc, eq, gt, ilike, inArray, lt, or, sql, SQLWrapper } from 'drizzle-orm';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(
@@ -32,15 +32,40 @@ export async function GET(
             sortBy = media.mediaSize
         }
 
-        const medias = await db.select().from(media).orderBy(sortingParam?.match("descending") ? desc(sortBy) : sortingParam?.match("random") ? sql`RANDOM()` : asc(sortBy)).where(and(
-            mediaTypesParam ? inArray(media.mediaType, mediaTypesParam) : undefined,
-            afterDateParam ? gt(media.mediaCreatedAt, afterDateParam) : undefined,
-            beforeDateParam ? lt(media.mediaCreatedAt, beforeDateParam) : undefined,
-            sizeParam ? lt(media.mediaSize, sizeParam) : undefined,
-            or(
-                ...searchArr,
-            )
-        )).limit(count ? +count : 10).offset(offset ? +offset : 0)
+        // const medias = await db.select().from(media)
+        //     .leftJoin(mediasToAlbums, eq(mediasToAlbums.mediaID, media.id))
+        //     .leftJoin(album, eq(mediasToAlbums.albumID, album.id))
+        //     .orderBy(sortingParam?.match("descending") ? desc(sortBy) : sortingParam?.match("random") ? sql`RANDOM()` : asc(sortBy)).where(and(
+        //         mediaTypesParam ? inArray(media.mediaType, mediaTypesParam) : undefined,
+        //         afterDateParam ? gt(media.mediaCreatedAt, afterDateParam) : undefined,
+        //         beforeDateParam ? lt(media.mediaCreatedAt, beforeDateParam) : undefined,
+        //         sizeParam ? lt(media.mediaSize, sizeParam) : undefined,
+        //         or(
+        //             ...searchArr,
+        //         )
+        //     )).limit(count ? +count : 10).offset(offset ? +offset : 0)
+
+        const medias = await db.query.media.findMany({
+            where: and(
+                    mediaTypesParam ? inArray(media.mediaType, mediaTypesParam) : undefined,
+                    afterDateParam ? gt(media.mediaCreatedAt, afterDateParam) : undefined,
+                    beforeDateParam ? lt(media.mediaCreatedAt, beforeDateParam) : undefined,
+                    sizeParam ? lt(media.mediaSize, sizeParam) : undefined,
+                    or(
+                        ...searchArr,
+                    )
+                ),
+            with: {
+                albums: {
+                    with: {
+                        album: true
+                    }
+                }
+            },
+            orderBy: sortingParam?.match("descending") ? desc(sortBy) : sortingParam?.match("random") ? sql`RANDOM()` : asc(sortBy),
+            limit: count ? +count : 10,
+            offset: offset ? +offset : 0
+        })
 
         if (!medias) throw new Error("Failed to get medias");
 
