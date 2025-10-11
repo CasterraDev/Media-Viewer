@@ -4,7 +4,7 @@ import { getMedias } from "@/actions/getMedia";
 import { filterTypeToPrimative, getMediaSizing } from "@/utils/clientUtil";
 import { filter, mediaList, mediaNotFinished, mediaOffset, mediaPresentIdx } from "@/utils/signals";
 import { useSignals } from "@preact/signals-react/runtime";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { useInView } from "react-intersection-observer";
 import { Button } from "./ui/button";
 import MediaShow from "./MediaShow";
@@ -26,6 +26,8 @@ export default function MediaLoader(props: MediaLoaderType) {
 
     const { ref, inView } = useInView()
     const [allAlbums, setAllAlbums] = useState<Album[]>([])
+    const [tabIdx, setTabIdx] = useState<number>(0)
+    const tabIdxRef = useRef<number>(tabIdx)
 
     async function loadMoreMedias() {
         let f;
@@ -73,6 +75,33 @@ export default function MediaLoader(props: MediaLoaderType) {
         mediaPresentIdx.value = idx
     }
 
+    function keyDownHandler(e: KeyboardEvent) {
+        if (e.code === "ArrowRight") {
+            setTabIdx(prev => {
+                document.getElementById(`Media-Show-${mediaList.value[prev + 1]?.id}`)?.scrollIntoView({ block: "center" });
+                tabIdxRef.current = prev + 1;
+                return prev + 1;
+            });
+        } else if (e.code === "ArrowLeft") {
+            setTabIdx(prev => {
+                document.getElementById(`Media-Show-${mediaList.value[prev - 1]?.id}`)?.scrollIntoView({ block: "center" });
+                tabIdxRef.current = prev - 1;
+                return prev - 1;
+            });
+        } else if (e.code === "ControlRight") {
+            mediaClick(tabIdxRef.current)
+        }
+    }
+
+    useEffect(() => {
+        document.addEventListener("keydown", keyDownHandler);
+
+        // clean up
+        return () => {
+            document.removeEventListener("keydown", keyDownHandler);
+        };
+    }, [])
+
     return (
         <div>
             <div className={`grid w-full h-full`}
@@ -80,13 +109,14 @@ export default function MediaLoader(props: MediaLoaderType) {
                 {mediaList.value.map((m, i) => (
                     <Suspense key={`Media-Loader-${m.id}-${i}`}>
                         <MediaShow media={m} idx={i} dimensionType={getMediaSizing(m.mediaWidth, m.mediaHeight)}
-                            sizeScale={props.sizeScale} onClick={mediaClick} />
+                            onClick={() => { setTabIdx(i) }}
+                            sizeScale={props.sizeScale} onMedia={mediaClick} focus={i == tabIdx} />
                     </Suspense>
                 ))}
             </div>
             {mediaPresentIdx.value != null &&
                 <Suspense>
-                    <MediaPresent mediaAlbums={mediaList.value[mediaPresentIdx.value]} mediaIdx={mediaPresentIdx.value} allAlbums={allAlbums}/>
+                    <MediaPresent mediaAlbums={mediaList.value[mediaPresentIdx.value]} mediaIdx={mediaPresentIdx.value} allAlbums={allAlbums} />
                 </Suspense>
             }
             <Show when={mediaNotFinished}>

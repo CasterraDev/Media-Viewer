@@ -11,22 +11,32 @@ type MediaShowType = {
     idx: number
     dimensionType: MediaSizing
     sizeScale?: number
-    onClick?: (idx: number) => void
+    onMedia?: (idx: number) => void
+    focus?: boolean
 }
 
 
-export default function MediaShow(props: MediaShowType) {
-    const [media, _setMedia] = useState<Media>(props.media);
+export default function MediaShow(
+    {
+    media,
+    idx,
+    dimensionType,
+    sizeScale,
+    onMedia,
+    focus,
+    ...props
+    }: MediaShowType & React.ComponentProps<"div">) {
+    const [mediaST, _setMediaST] = useState<Media>(media);
 
     const dynaMedia = (): ReactNode => {
-        if (!media) return;
-        if (media.mediaType.includes("photos")) {
+        if (!mediaST) return;
+        if (mediaST.mediaType.includes("photos")) {
             return (
-                <button className="relative w-full h-fit" onClick={() => {if (props.onClick) props.onClick(props.idx)}}>
+                <button className="relative w-full h-fit" onClick={() => { if (onMedia) onMedia(idx) }}>
                     <Image
                         alt={`${media.title || media.mediaFilename}`}
                         src={`/api/getMedia?mediaID=${media.id}`}
-                        sizes={props.sizeScale ? `calc(100vw * ${props.sizeScale})` : "100vw"}
+                        sizes={sizeScale ? `calc(100vw * ${sizeScale})` : "100vw"}
                         style={{
                             width: '100%',
                             height: 'auto',
@@ -39,7 +49,7 @@ export default function MediaShow(props: MediaShowType) {
         } else {
             return (
                 <button
-                    className="relative w-full h-fit" onClick={() => {if (props.onClick) props.onClick(props.idx)}}>
+                    className="relative w-full h-fit" onClick={() => { if (onMedia) onMedia(idx) }}>
                     <video preload="metadata" playsInline={true}>
                         <source src={`/api/getMedia?mediaID=${media.id}`} />
                     </video>
@@ -54,7 +64,7 @@ export default function MediaShow(props: MediaShowType) {
 
     return (
         <>
-            <div id={`Media-Show-${props.idx}`} className={`MediaShow ${MediaSizing[props.dimensionType]} w-full h-full`}>
+            <div id={`Media-Show-${media.id}`} {...props} className={`MediaShow ${MediaSizing[dimensionType]} w-full h-full ${focus && "border-red-500 border-2"}`}>
                 {
                     dynaMedia()
                 }

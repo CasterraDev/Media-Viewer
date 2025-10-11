@@ -39,8 +39,7 @@ function close() {
     mediaPresentIdx.value = null
 }
 
-
-export default function MediaPresent({ mediaAlbums, mediaIdx, allAlbums }: { mediaAlbums: MediaAlbums, mediaIdx: number, allAlbums?: Album[] }) {
+export default function MediaPresent({ mediaAlbums, mediaIdx, allAlbums, ...props }: { mediaAlbums: MediaAlbums, mediaIdx: number, allAlbums?: Album[] } & React.ComponentProps<"div">) {
     const media = mediaAlbums
     console.log(mediaAlbums);
     const { userPrefs, updateUserPrefs } = useUserPrefs("settings");
@@ -61,7 +60,7 @@ export default function MediaPresent({ mediaAlbums, mediaIdx, allAlbums }: { med
                 mediaPresentIdx.value = idx + 1;
             }
         }
-        document.getElementById(`Media-Show-${mediaPresentIdx}`)?.scrollIntoView();
+        document.getElementById(`Media-Show-${media.id}`)?.scrollIntoView();
     }
 
     const dynaMedia = (m: Media): ReactNode => {
@@ -69,7 +68,7 @@ export default function MediaPresent({ mediaAlbums, mediaIdx, allAlbums }: { med
         const sizing = getMediaSizing(m.mediaWidth, m.mediaHeight);
         if (m.mediaType.includes("photos")) {
             return (
-                <div ref={ref} className="w-full h-full flex items-center z-0">
+                <div ref={ref} className="w-full h-full flex items-center z-0" {...props}>
                     <Image
                         alt={`${m.title || m.mediaFilename}`}
                         src={`/api/getMedia?mediaID=${m.id}`}
@@ -117,7 +116,6 @@ export default function MediaPresent({ mediaAlbums, mediaIdx, allAlbums }: { med
         } else if (e.code == 'KeyI') {
             setInfo(prev => !prev);
         }
-        console.log(e.code)
     }
 
     useEffect(() => {
