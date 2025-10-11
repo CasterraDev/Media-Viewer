@@ -1,6 +1,6 @@
 import { db } from '@/db';
 import { media, schema } from '@/db/schema';
-import { and, eq } from 'drizzle-orm';
+import { and, eq, or } from 'drizzle-orm';
 import { readdirSync } from 'fs';
 import { stat } from 'fs/promises';
 import { NextRequest, NextResponse } from 'next/server';
@@ -34,11 +34,11 @@ const uploadFiles = async (filepath: string, mediaRoot: string): Promise<number>
                     }
                     const name = path.basename(x);
 
-                    const check = await db.select().from(media).where(and(
-                        eq(media.mediaRoot, root),
-                        eq(media.mediaDir, dir),
-                        eq(media.mediaFilename, name),
-                    )).limit(1)
+                    const check = await db.select().from(media).where(
+                        // Match the full filepath just incase the media roots involve a parent AND a child.
+                        // like /images/cats/ AND /images/cats/tabby/
+                        eq(media.mediaFilePath, root + dir + name)
+                    ).limit(1)
 
                     if (check.length > 0) {
                         return;
