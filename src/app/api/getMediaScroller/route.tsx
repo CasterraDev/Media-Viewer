@@ -30,6 +30,8 @@ export async function GET(
         let sortBy: AnyColumn | SQLWrapper = media.mediaCreatedAt
         if (sortByParam == "size") {
             sortBy = media.mediaSize
+        }else if (sortByParam == "modified"){
+            sortBy = media.mediaUpdatedAt
         }
 
         // const medias = await db.select().from(media)

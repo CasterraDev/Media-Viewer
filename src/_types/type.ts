@@ -42,14 +42,14 @@ export type MediaTypes = {
 }
 
 export type FilterSorting = "ascending" | "descending" | "random"
-export type FilterSortBy = "created" | "size"
+export type FilterSortBy = "created" | "modified" | "size"
 
 export enum FilterSortingEnum {
     "ascending", "descending", "random"
 }
 
 export enum FilterSortByEnum {
-    "created", "size"
+    "created", "modified", "size"
 }
 
 export type Filter = {
