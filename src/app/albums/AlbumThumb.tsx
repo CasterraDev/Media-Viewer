@@ -21,11 +21,12 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { BsThreeDotsVertical } from "react-icons/bs";
-import { MediaSizing } from "@/_types/type";
+import { Filter, FilterPrimative, MediaSizing } from "@/_types/type";
 import { useSignals } from "@preact/signals-react/runtime";
 import { useInView } from "react-intersection-observer";
 import { Show } from "@preact/signals-react/utils";
 import { changeAlbum } from "@/actions/changeAlbum";
+import MediaLoader from "@/components/MediaLoader";
 
 type AlbumThumbProps = {
     album: Album & { thumbnail: Media }
@@ -78,6 +79,13 @@ export default function AlbumThumb(props: AlbumThumbProps) {
         await changeAlbum(formData);
     }
 
+    function getFilter(): FilterPrimative{
+        const f = filterTypeToPrimative(filter);
+        f.media = { photos: true, videos: false };
+        f.size = "400000000"
+        return f;
+    }
+
     const dynaMedia = (): ReactNode => {
         if (!media) return;
         if (media.mediaType.includes("photos")) {
@@ -103,6 +111,28 @@ export default function AlbumThumb(props: AlbumThumbProps) {
             )
         }
     }
+
+                                    // <div className="grid gap-4 scroll-auto max-h-[80vh]">
+                                    //     <div className="grid gap-3">
+                                    //         <label htmlFor="thumbnail">Media Thumbnail Src</label>
+                                    //         <Input form="change-album-form" id="thumbnail" name="thumbnail" defaultValue={props.album?.thumbnail?.mediaFilePath || ""} />
+                                    //     </div>
+                                    //     <div className="grid w-full h-fit grid-cols-2 max-h-4/5 overflow-scroll">
+                                    //         {mediaList.value.map((m, i) => (
+                                    //             <div key={m.id}>
+                                    //                 <Suspense>
+                                    //                     <MediaShow sizeScale={.05} media={m} idx={i} dimensionType={MediaSizing.portrait} />
+                                    //                 </Suspense>
+                                    //             </div>
+                                    //         ))}
+                                    //         <Show when={mediaNotFinished}>
+                                    //             <div className="flex flex-col justify-center mt-20 gap-3">
+                                    //                 <div ref={ref} className="w-fit mx-auto p-5 border-1 rounded-lg">Loading...</div>
+                                    //                 <Button onClick={loadMoreMedias} className="w-fit mx-auto p-5 border-1 rounded-lg">Load More</Button>
+                                    //             </div>
+                                    //         </Show>
+                                    //     </div>
+                                    // </div>
 
     return (
         <div className="group flex flex-col w-fit h-fit">
@@ -137,28 +167,10 @@ export default function AlbumThumb(props: AlbumThumbProps) {
                                     <DialogHeader>
                                         <DialogTitle>Select Album Thumbnail</DialogTitle>
                                     </DialogHeader>
-                                    <div className="grid gap-4 scroll-auto max-h-[80vh]">
-                                        <div className="grid gap-3">
-                                            <label htmlFor="thumbnail">Media Thumbnail Src</label>
-                                            <Input form="change-album-form" id="thumbnail" name="thumbnail" defaultValue={props.album?.thumbnail?.mediaFilePath || ""} />
-                                        </div>
-                                        <div className="grid w-full h-fit grid-cols-2 max-h-4/5 overflow-scroll">
-                                            {mediaList.value.map((m, i) => (
-                                                <div key={m.id}>
-                                                    <Suspense>
-                                                        <MediaShow sizeScale={.05} media={m} idx={i} dimensionType={MediaSizing.portrait} />
-                                                    </Suspense>
-                                                </div>
-                                            ))}
-                                            <Show when={mediaNotFinished}>
-                                                <div className="flex flex-col justify-center mt-20 gap-3">
-                                                    <div ref={ref} className="w-fit mx-auto p-5 border-1 rounded-lg">Loading...</div>
-                                                    <Button onClick={loadMoreMedias} className="w-fit mx-auto p-5 border-1 rounded-lg">Load More</Button>
-                                                </div>
-                                            </Show>
-                                        </div>
-                                    </div>
                                 </DialogContent>
+                                <div>
+                                    <MediaLoader reset={true} filter={getFilter()} />
+                                </div>
                             </Dialog>
                             <DialogFooter>
                                 <DialogClose asChild>

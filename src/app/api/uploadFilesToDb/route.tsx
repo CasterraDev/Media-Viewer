@@ -1,8 +1,6 @@
 import { db } from '@/db';
 import { media, schema } from '@/db/schema';
-import { and, eq, or } from 'drizzle-orm';
-import { readdirSync } from 'fs';
-import { stat } from 'fs/promises';
+import { readdir, stat } from 'fs/promises';
 import { NextRequest, NextResponse } from 'next/server';
 import path from 'path';
 import { fileTypeFromFile } from 'file-type'
@@ -10,46 +8,47 @@ import { imageSizeFromFile } from 'image-size/fromFile'
 import { getType, getVideoData } from '@/utils/util';
 import { MediaType } from '@/_types/type';
 
-const uploadFiles = async (filepath: string, mediaRoot: string): Promise<number> => {
-    return new Promise((resolve, reject) => {
-        let newFiles = 0;
+const uploadFiles = async (filepath: string, mediaRoot: string): Promise<{ newFiles: string[], rejectedFiles: string[], errorFiles: string[] }> => {
+    return new Promise(async (resolve, _reject) => {
+        let pf: { newFiles: string[], rejectedFiles: string[], errorFiles: string[] } = { newFiles: [], rejectedFiles: [], errorFiles: [] }
         let mimeType: string | undefined = undefined;
-        readdirSync(filepath).forEach(async (file) => {
+        let files = await readdir(filepath)
+
+        for (let f in files) {
+            let file = files[f]
+            let root = ""
+            let dir = ""
+            let name = ""
             try {
-                const root = mediaRoot.endsWith('/') ? mediaRoot : mediaRoot + '/'
+                root = mediaRoot.endsWith('/') ? mediaRoot : mediaRoot + '/'
                 const filename = filepath + "/" + file;
 
                 const stats = await stat(filename);
 
                 if (stats.isDirectory()) {
-                    newFiles += await uploadFiles(filename, root);
+                    let y = await uploadFiles(filename, root);
+                    pf.newFiles = pf.newFiles.concat(y.newFiles);
+                    pf.rejectedFiles = pf.rejectedFiles.concat(y.rejectedFiles);
+                    pf.errorFiles = pf.errorFiles.concat(y.errorFiles);
                 } else {
                     const x = filename.replace(root, "");
-                    let dir = path.dirname(x);
+                    dir = path.dirname(x);
                     if (!dir.endsWith('/')) {
                         dir = dir.concat('/')
                     }
                     if (dir.startsWith('/')) {
                         dir = dir.slice(1);
                     }
-                    const name = path.basename(x);
-
-                    const check = await db.select().from(media).where(
-                        // Match the full filepath just incase the media roots involve a parent AND a child.
-                        // like /images/cats/ AND /images/cats/tabby/
-                        eq(media.mediaFilePath, root + dir + name)
-                    ).limit(1)
-
-                    if (check.length > 0) {
-                        return;
+                    if (dir == "./") {
+                        dir = ""
                     }
+                    name = path.basename(x);
 
                     mimeType = (await fileTypeFromFile(filename))?.mime
-                    console.log(file + ", " + mimeType)
+                    // console.log(file + ", " + mimeType)
                     // Return if file is not supported
                     if (!mimeType || mimeType.includes("json")) {
-                        console.error("File type not supported: File: " + file + " Mime: " + mimeType)
-                        return
+                        throw new Error("File type not supported: File: " + file + " Mime: " + mimeType)
                     }
 
                     const type = getType(mimeType)
@@ -83,14 +82,24 @@ const uploadFiles = async (filepath: string, mediaRoot: string): Promise<number>
                         m.mediaDurationInSecs = duration;
                     }
 
-                    await db.insert(media).values(m)
+                    await db.insert(media).values(m).then(() => {
+                        pf.newFiles.push(root + dir + name);
+                    })
                 }
-            } catch (error) {
-                console.log(`Error Occurred: ${error} File: ${file} MT: ${mimeType}`)
-                reject(`Error Occurred: ${error} File: ${file} MT: ${mimeType}`);
+            } catch (error: unknown) {
+                // console.log(JSON.stringify(error))
+                // isUniqueConstraintError
+                if ((error as any)?.cause?.code === '23505') {
+                    pf.rejectedFiles.push(root + dir + name);
+                    // console.log(`isUniqueConstraintError Occurred: ${error} File: ${file} MT: ${mimeType}`)
+                } else {
+                    pf.errorFiles.push(root + dir + name);
+                    // console.log(`Error Occurred: ${error} File: ${file} MT: ${mimeType}`)
+                    // console.log((error as any).cause.code)
+                }
             }
-        })
-        resolve(newFiles);
+        }
+        resolve(pf);
     })
 }
 
@@ -102,14 +111,16 @@ export async function POST(
         const mediaRoots: string[] | null = body.mediaRoots;
         if (!mediaRoots) throw new Error("No media roots passed.")
 
-        mediaRoots.map(async (m) => {
-            console.log("Root: " + m)
-            await uploadFiles(m, m);
-        })
-
-        return new Response('Success', { status: 200 });
+        let pf: { newFiles: string[], rejectedFiles: string[], errorFiles: string[] } = { newFiles: [], rejectedFiles: [], errorFiles: [] }
+        for (let x in mediaRoots) {
+            let m = mediaRoots[x]
+            let y = await uploadFiles(m, m);
+            pf.newFiles = pf.newFiles.concat(y.newFiles);
+            pf.rejectedFiles = pf.rejectedFiles.concat(y.rejectedFiles);
+            pf.errorFiles = pf.errorFiles.concat(y.errorFiles);
+        }
+        return NextResponse.json(pf, { status: 200 });
     } catch (err: unknown) {
-        console.error(`Error processing request: ${err}`);
         return new Response(`Internal server error: ${err}`, { status: 500 });
     }
 }

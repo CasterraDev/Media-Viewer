@@ -17,7 +17,7 @@ export const media = pgTable("Media", {
     mediaRoot: text().notNull(),
     mediaDir: text().notNull(),
     mediaFilename: text().notNull(),
-    mediaFilePath: text().notNull(),
+    mediaFilePath: text().notNull().unique(),
     mediaSize: numeric().notNull(),
     mediaWidth: integer().notNull(),
     mediaHeight: integer().notNull(),
