@@ -144,9 +144,9 @@ export default function AlbumThumb(props: AlbumThumbProps) {
                                         </div>
                                         <div className="grid w-full h-fit grid-cols-2 max-h-4/5 overflow-scroll">
                                             {mediaList.value.map((m, i) => (
-                                                <div key={m.Media.id}>
+                                                <div key={m.id}>
                                                     <Suspense>
-                                                        <MediaShow sizeScale={.05} media={m.Media} idx={i} dimensionType={MediaSizing.portrait} />
+                                                        <MediaShow sizeScale={.05} media={m} idx={i} dimensionType={MediaSizing.portrait} />
                                                     </Suspense>
                                                 </div>
                                             ))}
