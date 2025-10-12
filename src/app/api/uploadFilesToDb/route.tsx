@@ -7,10 +7,15 @@ import { fileTypeFromFile } from 'file-type'
 import { imageSizeFromFile } from 'image-size/fromFile'
 import { getType, getVideoData } from '@/utils/util';
 import { MediaType } from '@/_types/type';
+import { eq } from 'drizzle-orm';
+import { FileError } from '@/errors/Files';
 
-const uploadFiles = async (filepath: string, mediaRoot: string): Promise<{ newFiles: string[], rejectedFiles: string[], errorFiles: string[] }> => {
+type FileErrorReason = { file: string, reason: string }
+type PromiseReturn = { newFiles: string[], rejectedFiles: FileErrorReason[], errorFiles: FileErrorReason[] }
+
+const uploadFiles = async (filepath: string, mediaRoot: string): Promise<PromiseReturn> => {
     return new Promise(async (resolve, _reject) => {
-        let pf: { newFiles: string[], rejectedFiles: string[], errorFiles: string[] } = { newFiles: [], rejectedFiles: [], errorFiles: [] }
+        let pf: PromiseReturn = { newFiles: [], rejectedFiles: [], errorFiles: [] }
         let mimeType: string | undefined = undefined;
         let files = await readdir(filepath)
 
@@ -44,11 +49,18 @@ const uploadFiles = async (filepath: string, mediaRoot: string): Promise<{ newFi
                     }
                     name = path.basename(x);
 
+                    let check = await db.select().from(media).where(
+                        eq(media.mediaFilePath, root + dir + name)
+                    );
+                    if (check.length > 0) {
+                        throw new FileError("101", root + dir + name, "File already in Database. Via matching mediaFilePath.")
+                    }
+
                     mimeType = (await fileTypeFromFile(filename))?.mime
                     // console.log(file + ", " + mimeType)
                     // Return if file is not supported
                     if (!mimeType || mimeType.includes("json")) {
-                        throw new Error("File type not supported: File: " + file + " Mime: " + mimeType)
+                        throw new FileError("102", root + dir + name, "File type not supported: File: " + file + " Mime: " + mimeType)
                     }
 
                     const type = getType(mimeType)
@@ -90,10 +102,10 @@ const uploadFiles = async (filepath: string, mediaRoot: string): Promise<{ newFi
                 // console.log(JSON.stringify(error))
                 // isUniqueConstraintError
                 if ((error as any)?.cause?.code === '23505') {
-                    pf.rejectedFiles.push(root + dir + name);
+                    pf.rejectedFiles.push({ file: root + dir + name, reason: "isUniqueConstraintError" });
                     // console.log(`isUniqueConstraintError Occurred: ${error} File: ${file} MT: ${mimeType}`)
-                } else {
-                    pf.errorFiles.push(root + dir + name);
+                } else if (error instanceof FileError) {
+                    pf.errorFiles.push({ file: root + dir + name, reason: error.cause });
                     // console.log(`Error Occurred: ${error} File: ${file} MT: ${mimeType}`)
                     // console.log((error as any).cause.code)
                 }
@@ -111,7 +123,7 @@ export async function POST(
         const mediaRoots: string[] | null = body.mediaRoots;
         if (!mediaRoots) throw new Error("No media roots passed.")
 
-        let pf: { newFiles: string[], rejectedFiles: string[], errorFiles: string[] } = { newFiles: [], rejectedFiles: [], errorFiles: [] }
+        let pf: PromiseReturn = { newFiles: [], rejectedFiles: [], errorFiles: [] }
         for (let x in mediaRoots) {
             let m = mediaRoots[x]
             let y = await uploadFiles(m, m);

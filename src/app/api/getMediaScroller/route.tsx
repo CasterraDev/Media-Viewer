@@ -1,6 +1,6 @@
 import { db } from '@/db';
-import { album, media, mediasToAlbums } from '@/db/schema';
-import { and, AnyColumn, asc, desc, eq, gt, ilike, inArray, lt, or, sql, SQLWrapper } from 'drizzle-orm';
+import { media } from '@/db/schema';
+import { and, AnyColumn, asc, desc, gt, ilike, inArray, lt, or, sql, SQLWrapper } from 'drizzle-orm';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(
@@ -20,7 +20,8 @@ export async function GET(
         let searchArr: SQLWrapper[] = []
 
         for (let i = 0; i < searchParam.length; i++) {
-            const e = searchParam[i];
+            let e = searchParam[i];
+            e = decodeURI(e);
             e.trim();
             searchArr.push(ilike(media.title, `%${e}%`))
             searchArr.push(ilike(media.description, `%${e}%`))
@@ -33,19 +34,6 @@ export async function GET(
         }else if (sortByParam == "modified"){
             sortBy = media.mediaUpdatedAt
         }
-
-        // const medias = await db.select().from(media)
-        //     .leftJoin(mediasToAlbums, eq(mediasToAlbums.mediaID, media.id))
-        //     .leftJoin(album, eq(mediasToAlbums.albumID, album.id))
-        //     .orderBy(sortingParam?.match("descending") ? desc(sortBy) : sortingParam?.match("random") ? sql`RANDOM()` : asc(sortBy)).where(and(
-        //         mediaTypesParam ? inArray(media.mediaType, mediaTypesParam) : undefined,
-        //         afterDateParam ? gt(media.mediaCreatedAt, afterDateParam) : undefined,
-        //         beforeDateParam ? lt(media.mediaCreatedAt, beforeDateParam) : undefined,
-        //         sizeParam ? lt(media.mediaSize, sizeParam) : undefined,
-        //         or(
-        //             ...searchArr,
-        //         )
-        //     )).limit(count ? +count : 10).offset(offset ? +offset : 0)
 
         const medias = await db.query.media.findMany({
             where: and(
