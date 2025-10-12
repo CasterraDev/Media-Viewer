@@ -32,6 +32,7 @@ import {
 import { RiExpandUpDownLine } from "react-icons/ri";
 import { useRouter } from "next/navigation"
 import { LuAlbum } from "react-icons/lu";
+import AlbumCommand from "./AlbumCommand"
 
 function close() {
     document.body.classList.remove("overflow-x-hidden")
@@ -187,45 +188,7 @@ export default function MediaPresent({ mediaAlbums, mediaIdx, allAlbums, ...prop
                                 <p className="flex flex-row gap-2" key={"Album-Present-Title-" + a.title + a.id}><LuAlbum className="w-auto h-auto" />{a.title}</p>
                             )
                         })}
-                        {allAlbums &&
-                            <Popover open={albumComboboxOpen} onOpenChange={setAlbumComboboxOpen}>
-                                <PopoverTrigger asChild>
-                                    <Button
-                                        variant="outline"
-                                        role="combobox"
-                                        aria-expanded={albumComboboxOpen}
-                                        className="w-[200px] justify-between"
-                                        disabled={albumAddStatusDisabled}
-                                    >
-                                        Select an Album
-                                        <RiExpandUpDownLine />
-                                    </Button>
-                                </PopoverTrigger>
-                                <PopoverContent className="w-[200px] p-0">
-                                    <Command>
-                                        <CommandInput placeholder="Search Albums..." className="h-9" />
-                                        <CommandList>
-                                            <CommandEmpty>No Albums found.</CommandEmpty>
-                                            <CommandGroup>
-                                                {allAlbums.map((album) => (
-                                                    <CommandItem
-                                                        key={album.title + album.id}
-                                                        value={album.title + album.id}
-                                                        onSelect={() => {
-                                                            addMediaToAlbum(album.id)
-                                                        }}
-                                                        className="cursor-pointer"
-                                                        disabled={albumAddStatusDisabled}
-                                                    >
-                                                        {album.title}
-                                                    </CommandItem>
-                                                ))}
-                                            </CommandGroup>
-                                        </CommandList>
-                                    </Command>
-                                </PopoverContent>
-                            </Popover>
-                        }
+                        <AlbumCommand onlyTitle={true} onAlbumSelect={(a) => addMediaToAlbum(a.id)} listClassname="grid grid-cols-1" contentClassname="w-[10rem] p-1 max-h-[40rem] overflow-auto"/>
                     </div>
                 </div>
             }

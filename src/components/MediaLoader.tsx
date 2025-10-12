@@ -2,7 +2,7 @@
 
 import { getMedias } from "@/actions/getMedia";
 import { filterTypeToPrimative, getMediaSizing } from "@/utils/clientUtil";
-import { filter, mediaList, mediaNotFinished, mediaOffset, mediaPresentIdx } from "@/utils/signals";
+import { filter, mediaList, mediaNotFinished, mediaOffset, mediaPresentIdx, mediaSelectList } from "@/utils/signals";
 import { useSignals } from "@preact/signals-react/runtime";
 import { Suspense, useEffect, useRef, useState } from "react";
 import { useInView } from "react-intersection-observer";
@@ -11,8 +11,13 @@ import MediaShow from "./MediaShow";
 import { FilterPrimative } from "@/_types/type";
 import MediaPresent from "./MediaPresent";
 import { Show } from "@preact/signals-react/utils";
-import { Album } from "@/db/types";
+import { Album, Media } from "@/db/types";
 import { getAllAlbums } from "@/actions/getAllAlbums";
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "./ui/dialog";
+import AlbumCommand from "./AlbumCommand";
+import { setMediasToAlbum } from "@/actions/setMediasToAlbum";
+import { PiSelectionForeground } from "react-icons/pi";
+import { PiSelectionSlash } from "react-icons/pi";
 
 type MediaLoaderType = {
     gridCols?: number
@@ -75,6 +80,21 @@ export default function MediaLoader(props: MediaLoaderType) {
         mediaPresentIdx.value = idx
     }
 
+    function selectClick(idx: number) {
+        let dx = mediaSelectList.value.indexOf(mediaList.value[idx])
+        if (dx != -1) {
+            console.log("Splice")
+            // mediaSelectList.value.splice(dx, 1);
+            let arr = mediaSelectList.value.slice(0);
+            arr.splice(dx, 1)
+            mediaSelectList.value = arr;
+        } else {
+            console.log("Add")
+            mediaSelectList.value = [...mediaSelectList.value, mediaList.value[idx]]
+        }
+        console.log(mediaSelectList.value)
+    }
+
     function keyDownHandler(e: KeyboardEvent) {
         if (e.code === "ArrowRight") {
             setTabIdx(prev => {
@@ -102,14 +122,31 @@ export default function MediaLoader(props: MediaLoaderType) {
         };
     }, [])
 
+    async function albumSelect(album: Album & {thumbnail: Media}){
+        let arr = []
+        for (let x in mediaSelectList.value){
+            arr.push(mediaSelectList.value[x].id)
+        }
+        await setMediasToAlbum(album.id, arr)
+    }
+
     return (
-        <div>
+        <div className="relative">
+            {mediaSelectList.value.length > 0 &&
+                <div className="sticky top-[var(--topBarHeight)] w-full h-10 z-50 px-4 flex flex-row gap-2">
+                    <p>{mediaSelectList.value.length} Selected</p>
+                    <div className="grow" />
+                    <AlbumCommand onAlbumSelect={albumSelect} listClassname="grid grid-cols-4" contentClassname="w-[80vw]"/>
+                    <Button onClick={() => { mediaSelectList.value = [] }}><PiSelectionSlash /></Button>
+                    <Button onClick={() => { mediaSelectList.value = mediaList.value }}><PiSelectionForeground /></Button>
+                </div>
+            }
             <div className={`grid w-full h-full`}
                 style={{ "gridTemplateColumns": `repeat(${props.gridCols || 4}, minmax(0, 1fr))` }}>
                 {mediaList.value.map((m, i) => (
                     <Suspense key={`Media-Loader-${m.id}-${i}`}>
                         <MediaShow media={m} idx={i} dimensionType={getMediaSizing(m.mediaWidth, m.mediaHeight)}
-                            onClick={() => { setTabIdx(i) }}
+                            onClick={() => { setTabIdx(i) }} onMediaSelect={selectClick} selected={mediaSelectList.value.includes(mediaList.value[i])}
                             sizeScale={props.sizeScale} onMedia={mediaClick} focus={i == tabIdx} />
                     </Suspense>
                 ))}

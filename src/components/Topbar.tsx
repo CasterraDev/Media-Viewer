@@ -13,7 +13,7 @@ import Search from "./Search";
 
 export default function Topbar() {
     return (
-        <div className="p-3 sticky top-0 z-50 bg-[var(--color-background)] flex flex-row gap-5">
+        <div className="p-3 sticky top-0 z-50 bg-[var(--color-background)] flex flex-row gap-5 h-[var(--topBarHeight)]">
             <Sheet>
                 <SheetTrigger asChild className="cursor-pointer w-fit">
                     <Button variant="outline">

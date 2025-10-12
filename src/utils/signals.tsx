@@ -4,6 +4,7 @@ import { Signal, signal } from '@preact/signals-react'
 
 export let refreshMediaList: Signal<number> = signal(0)
 export let mediaList: Signal<MediaAlbums[]> = signal([])
+export let mediaSelectList: Signal<MediaAlbums[]> = signal([])
 export let mediaNotFinished: Signal<boolean> = signal(true)
 export let mediaOffset: Signal<number> = signal(0)
 export let mediaPresentIdx: Signal<number | null> = signal(null)
