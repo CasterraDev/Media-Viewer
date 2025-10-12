@@ -2,7 +2,7 @@
 
 export const changeAlbum = async ( form: FormData ) => {
     try {
-        const response = await fetch(`http://localhost:3000/api/album/changeAlbum`, {
+        const response = await fetch(`http://localhost:3000/api/changeAlbum`, {
             method: 'POST',
             body: form
         })

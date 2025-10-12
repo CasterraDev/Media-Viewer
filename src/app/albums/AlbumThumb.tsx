@@ -68,24 +68,6 @@ export default function AlbumThumb(props: AlbumThumbProps) {
         fun()
     }, [])
 
-    async function submit(e: FormEvent<HTMLFormElement>) {
-        const formData = new FormData(e.currentTarget);
-        console.log(e.currentTarget.id);
-        formData.set("albumID", props.album.id)
-        for (const pair of formData.entries()) {
-            console.log(pair[0], pair[1]);
-        }
-
-        await changeAlbum(formData);
-    }
-
-    function getFilter(): FilterPrimative{
-        const f = filterTypeToPrimative(filter);
-        f.media = { photos: true, videos: false };
-        f.size = "400000000"
-        return f;
-    }
-
     const dynaMedia = (): ReactNode => {
         if (!media) return;
         if (media.mediaType.includes("photos")) {
@@ -112,83 +94,15 @@ export default function AlbumThumb(props: AlbumThumbProps) {
         }
     }
 
-                                    // <div className="grid gap-4 scroll-auto max-h-[80vh]">
-                                    //     <div className="grid gap-3">
-                                    //         <label htmlFor="thumbnail">Media Thumbnail Src</label>
-                                    //         <Input form="change-album-form" id="thumbnail" name="thumbnail" defaultValue={props.album?.thumbnail?.mediaFilePath || ""} />
-                                    //     </div>
-                                    //     <div className="grid w-full h-fit grid-cols-2 max-h-4/5 overflow-scroll">
-                                    //         {mediaList.value.map((m, i) => (
-                                    //             <div key={m.id}>
-                                    //                 <Suspense>
-                                    //                     <MediaShow sizeScale={.05} media={m} idx={i} dimensionType={MediaSizing.portrait} />
-                                    //                 </Suspense>
-                                    //             </div>
-                                    //         ))}
-                                    //         <Show when={mediaNotFinished}>
-                                    //             <div className="flex flex-col justify-center mt-20 gap-3">
-                                    //                 <div ref={ref} className="w-fit mx-auto p-5 border-1 rounded-lg">Loading...</div>
-                                    //                 <Button onClick={loadMoreMedias} className="w-fit mx-auto p-5 border-1 rounded-lg">Load More</Button>
-                                    //             </div>
-                                    //         </Show>
-                                    //     </div>
-                                    // </div>
-
     return (
         <div className="group flex flex-col w-fit h-fit">
-            <div className="relative w-40 h-40">
-                <Dialog>
-                    <form className="w-fit absolute top-2 right-2" onSubmit={submit} id="change-album-form">
-                        <DialogTrigger asChild>
-                            <button className="group-hover:block hidden z-10"><BsThreeDotsVertical /></button>
-                        </DialogTrigger>
-                        <DialogContent className="sm:max-w-[425px]">
-                            <DialogHeader>
-                                <DialogTitle>Edit Album</DialogTitle>
-                                <DialogDescription>
-                                    Make changes to your album here.
-                                </DialogDescription>
-                            </DialogHeader>
-                            <div className="grid gap-4">
-                                <div className="grid gap-3">
-                                    <label htmlFor="title">Title</label>
-                                    <Input form="change-album-form" id="title" name="title" defaultValue={props.album.title || ""} />
-                                </div>
-                                <div className="grid gap-3">
-                                    <label htmlFor="description">Description</label>
-                                    <Input form="change-album-form" id="description" name="description" defaultValue={props.album.description || ""} />
-                                </div>
-                            </div>
-                            <Dialog>
-                                <DialogTrigger asChild>
-                                    <button className=""><BsThreeDotsVertical /></button>
-                                </DialogTrigger>
-                                <DialogContent className="sm:max-w-[425px]">
-                                    <DialogHeader>
-                                        <DialogTitle>Select Album Thumbnail</DialogTitle>
-                                    </DialogHeader>
-                                </DialogContent>
-                                <div>
-                                    <MediaLoader reset={true} filter={getFilter()} />
-                                </div>
-                            </Dialog>
-                            <DialogFooter>
-                                <DialogClose asChild>
-                                    <Button variant="outline">Cancel</Button>
-                                </DialogClose>
-                                <Button form={"change-album-form"} type="submit">Save changes</Button>
-                            </DialogFooter>
-                        </DialogContent>
-                    </form>
-                </Dialog>
-                <button className="w-full h-full border-2 border-gray-500 rounded-lg shadow-accent shadow-[6px_6px]">
+            <div className="relative w-40 h-fit">
+                <button className="w-full h-40 border-2 border-gray-500 rounded-lg shadow-accent shadow-[6px_6px]">
                     {media && media != null &&
                         dynaMedia()
                     }
                 </button>
-                <form onSubmit={submit}>
-                    <input className="w-40" name="title" type="text" placeholder="Title" defaultValue={props.album?.title || ""} />
-                </form>
+                <input className="w-40" name="title" type="text" placeholder="Title" defaultValue={props.album?.title || ""} />
             </div>
         </div>
     )

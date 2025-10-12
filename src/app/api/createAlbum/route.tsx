@@ -14,7 +14,7 @@ export async function POST(
             const al = await db.insert(album).values({
                 title: body.title || null,
                 description: body.description || null
-            }).returning({ id: album.id })
+            }).returning({ id: album.id }).onConflictDoNothing()
 
             if (!(!body.mediaIDs || body.mediaIDs.length == 0)) {
                 const me = await db.select({ id: media.id }).from(media).where(

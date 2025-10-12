@@ -180,7 +180,7 @@ export default function MediaPresent({ mediaAlbums, mediaIdx, allAlbums, ...prop
                             {media.mediaFilePath}
                         </div>
                     </div>
-                    <div>
+                    <div className="pl-5">
                         {media.albums.length > 0 && media.albums.map((albums) => {
                             let a = albums.album;
                             return (
