@@ -36,11 +36,8 @@ export default function AlbumGrid() {
     }, [])
 
     async function submit(e: FormEvent<HTMLFormElement>){
-        console.log(e);
         let fd = new FormData(e.currentTarget);
-        console.log(fd)
         let p: Partial<CreateAlbumAPIPOST> = {title: fd.get("title")?.toString(), description: fd.get("description")?.toString()}
-        console.log(p);
         await createAlbum(p).then(async () => {
             setAlbums(await getAllAlbums())
         });

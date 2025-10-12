@@ -40,7 +40,7 @@ function close() {
 }
 
 export default function MediaPresent({ mediaAlbums, mediaIdx, allAlbums, ...props }: { mediaAlbums: MediaAlbums, mediaIdx: number, allAlbums?: Album[] } & React.ComponentProps<"div">) {
-    const media = mediaAlbums
+    const [media, setmedia] = useState<MediaAlbums>(mediaAlbums);
     console.log(mediaAlbums);
     const { userPrefs, updateUserPrefs } = useUserPrefs("settings");
     const [albumComboboxOpen, setAlbumComboboxOpen] = useState<boolean>(false);
