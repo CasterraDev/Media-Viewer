@@ -37,7 +37,8 @@ export function filterTypeToPrimative(filter: Filter): FilterPrimative {
         sorting: filter.sorting.value,
         sortBy: filter.sortBy.value,
         search: filter.search.value,
-        size: filter.size.value
+        size: filter.size.value,
+        albums: filter.albums.value
     }
     return f;
 }

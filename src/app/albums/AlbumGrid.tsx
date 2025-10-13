@@ -22,7 +22,7 @@ import { CreateAlbumAPIPOST } from "@/_types/api";
 import { FilterPrimative } from "@/_types/type";
 import { createAlbum } from "@/actions/createAlbum"
 import { filterTypeToPrimative } from "@/utils/clientUtil";
-import { filter } from "@/utils/signals";
+import { filterSignal } from "@/utils/signals";
 import { FormEvent } from "react";
 
 export default function AlbumGrid() {
@@ -44,7 +44,7 @@ export default function AlbumGrid() {
     }
 
     function getFilter(): FilterPrimative {
-        const f = filterTypeToPrimative(filter);
+        const f = filterTypeToPrimative(filterSignal);
         f.media = { photos: true, videos: false };
         f.size = "400000000"
         return f;

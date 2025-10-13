@@ -2,6 +2,7 @@
 
 import { FilterPrimative } from "@/_types/type"
 import { MediaAlbums } from "@/db/types";
+import { filterSignal } from "@/utils/signals";
 
 function pushDict(d: { [id: string]: any }, defaultVal: any, k: string, v: any) {
     if (!d[k]) {
@@ -13,12 +14,12 @@ function pushDict(d: { [id: string]: any }, defaultVal: any, k: string, v: any) 
 function parseSearch(s: string, d: { [id: string]: string | string[] }): { [id: string]: string | string[] } {
     let cmd: string = s.substring(s.indexOf("{")+1, s.indexOf("}"))
     let settings = cmd.split("&")
+    let firstTypes: { [id: string]: boolean } = {"type": true, "album": true}
     if (settings[0] == "" || settings == null) return d
     settings.map((x) => {
         let data = x.split(":")
         let key = data[0].trim().toLowerCase()
         let value = data[1].trim()
-        let firstType = true;
         console.log("Key: " + key + ", Val: " + value)
 
         // I want the search cmds to override the filter UI options
@@ -30,12 +31,22 @@ function parseSearch(s: string, d: { [id: string]: string | string[] }): { [id: 
                 d["sortBy"] = value
                 break;
             case "type":
-                if (firstType) {
+                if (firstTypes["type"]) {
                     d["mediaTypes"] = [value]
-                    firstType = false;
+                    firstTypes["type"] = false;
                 } else {
                     if (Array.isArray(d["mediaTypes"])){
                         d["mediaTypes"].push(value)
+                    }
+                }
+                break;
+            case "albums":
+                if (firstTypes["album"]) {
+                    d["albums"] = [value]
+                    firstTypes["album"] = false;
+                } else {
+                    if (Array.isArray(d["albums"])){
+                        d["albums"].push(value)
                     }
                 }
                 break;
@@ -67,6 +78,11 @@ export const getMedias = async (offset: number, limit: number, filter?: FilterPr
             if (filter.media.videos) {
                 pushDict(d, [], "mediaTypes", "videos");
             }
+            if (filter.albums){
+                for (let x in filter.albums){
+                    pushDict(d, [], "albums", filter.albums[x]);
+                }
+            }
 
             // parseSearch is going to overwrite some of the settings.
             // search filters take percedence over UI
@@ -89,14 +105,24 @@ export const getMedias = async (offset: number, limit: number, filter?: FilterPr
                     params = params.concat(`&mediaTypes=${x}`)
                 })
             }
+            if (d["albums"] && Array.isArray(d["albums"])) {
+                d["albums"].map((x) => {
+                    params = params.concat(`&albums=${x}`)
+                })
+            }
             if (filter.search != ""){
                 // Cut off the filter inside of search
                 let xs = filter.search.substring(filter.search.indexOf("}")+1)
+                xs = xs.trim();
                 // Split search by '+' seperator so you can search multiple things
                 let xsa: string[] = xs.split(' + ').map((y) => y.trim())
-                for (let i = 0; i < xsa.length; i++) {
-                    const e = xsa[i];
-                    params = params.concat(`&search=${encodeURI(e)}`)
+                if (xsa.length > 0){
+                    for (let i = 0; i < xsa.length; i++) {
+                        const e = xsa[i];
+                        if (e != ""){
+                            params = params.concat(`&search=${encodeURI(e)}`)
+                        }
+                    }
                 }
             }
         }

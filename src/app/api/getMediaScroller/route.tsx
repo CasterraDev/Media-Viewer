@@ -1,6 +1,6 @@
 import { db } from '@/db';
-import { media } from '@/db/schema';
-import { and, AnyColumn, asc, desc, gt, ilike, inArray, lt, or, sql, SQLWrapper } from 'drizzle-orm';
+import { media, mediasToAlbums } from '@/db/schema';
+import { and, AnyColumn, asc, desc, eq, gt, ilike, inArray, lt, or, sql, SQLWrapper } from 'drizzle-orm';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(
@@ -8,6 +8,7 @@ export async function GET(
 ) {
     try {
         const mediaTypesParam = req.nextUrl.searchParams.getAll("mediaTypes");
+        const albumsParam = req.nextUrl.searchParams.getAll("albums");
         const beforeDateParam = req.nextUrl.searchParams.get("beforeDate");
         const afterDateParam = req.nextUrl.searchParams.get("afterDate");
         const sortingParam = req.nextUrl.searchParams.get("sorting");
@@ -31,20 +32,27 @@ export async function GET(
         let sortBy: AnyColumn | SQLWrapper = media.mediaCreatedAt
         if (sortByParam == "size") {
             sortBy = media.mediaSize
-        }else if (sortByParam == "modified"){
+        } else if (sortByParam == "modified") {
             sortBy = media.mediaUpdatedAt
         }
 
+        // TODO: Make album titles be searchable, rn it's only ids
+        // search through albumsParam seperate into 2 arrs, 1 ids, 1 titles
+        // then make the below VVV albumsParam line into an or() with the two arrays
+
         const medias = await db.query.media.findMany({
             where: and(
-                    mediaTypesParam ? inArray(media.mediaType, mediaTypesParam) : undefined,
-                    afterDateParam ? gt(media.mediaCreatedAt, afterDateParam) : undefined,
-                    beforeDateParam ? lt(media.mediaCreatedAt, beforeDateParam) : undefined,
-                    sizeParam ? lt(media.mediaSize, sizeParam) : undefined,
-                    or(
-                        ...searchArr,
-                    )
-                ),
+                mediaTypesParam ? inArray(media.mediaType, mediaTypesParam) : undefined,
+                albumsParam ? inArray(media.id,
+                    db.select({ mediaID: mediasToAlbums.mediaID }).from(mediasToAlbums).where(inArray(mediasToAlbums.albumID, albumsParam))
+                ) : undefined,
+                afterDateParam ? gt(media.mediaCreatedAt, afterDateParam) : undefined,
+                beforeDateParam ? lt(media.mediaCreatedAt, beforeDateParam) : undefined,
+                sizeParam ? lt(media.mediaSize, sizeParam) : undefined,
+                or(
+                    ...searchArr,
+                )
+            ),
             with: {
                 albums: {
                     with: {
@@ -61,7 +69,7 @@ export async function GET(
 
         return NextResponse.json({ medias: medias }, { status: 200 });
     } catch (err: unknown) {
-        console.error(`Error processing request: ${err}`);
+        console.error(err);
         return new Response(`Internal server error: ${err}`, { status: 500 });
     }
 }

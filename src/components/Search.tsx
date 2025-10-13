@@ -11,7 +11,7 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
-import { filter, mediaNotFinished, mediaList, mediaOffset } from "@/utils/signals";
+import { filterSignal, mediaNotFinished, mediaList, mediaOffset } from "@/utils/signals";
 import { useSignals } from "@preact/signals-react/runtime";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuSeparator, DropdownMenuTrigger, Separator } from "@radix-ui/react-dropdown-menu";
 import { FormEvent } from "react";
@@ -24,12 +24,12 @@ function emptyMedia() {
 }
 
 function reset() {
-    filter.media.photos.value = true
-    filter.media.videos.value = true
+    filterSignal.media.photos.value = true
+    filterSignal.media.videos.value = true
 
-    filter.sorting.value = "ascending"
-    filter.sortBy.value = "created"
-    filter.search.value = ""
+    filterSignal.sorting.value = "ascending"
+    filterSignal.sortBy.value = "created"
+    filterSignal.search.value = ""
     emptyMedia()
 }
 
@@ -52,11 +52,11 @@ export default function Search() {
                     <div className="flex flex-row w-full justify-evenly">
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <Button variant="outline" className="capitalize">Sorting: {filter.sorting.value}</Button>
+                                <Button variant="outline" className="capitalize">Sorting: {filterSignal.sorting.value}</Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent className="w-fit">
                                 <DropdownMenuSeparator />
-                                <DropdownMenuRadioGroup value={filter.sorting.value} onValueChange={(e) => {filter.sorting.value = e as any; emptyMedia()}}
+                                <DropdownMenuRadioGroup value={filterSignal.sorting.value} onValueChange={(e) => {filterSignal.sorting.value = e as any; emptyMedia()}}
                                     className="border-1 border-[var(--color-foreground)] w-fit mx-auto bg-[var(--color-background)]">
                                     {(Object.keys(FilterSortingEnum) as Array<keyof typeof FilterSortingEnum>).filter((key) => Number.isNaN(+key)).map((x) => (
                                         <DropdownMenuRadioItem key={x} value={x}
@@ -71,11 +71,11 @@ export default function Search() {
 
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <Button variant="outline" className="capitalize">Sort By: {filter.sortBy.value}</Button>
+                                <Button variant="outline" className="capitalize">Sort By: {filterSignal.sortBy.value}</Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent className="w-fit">
                                 <DropdownMenuSeparator />
-                                <DropdownMenuRadioGroup value={filter.sortBy.value} onValueChange={(e) => {filter.sortBy.value = e as any; emptyMedia()}}
+                                <DropdownMenuRadioGroup value={filterSignal.sortBy.value} onValueChange={(e) => {filterSignal.sortBy.value = e as any; emptyMedia()}}
                                     className="border-1 border-[var(--color-foreground)] w-fit mx-auto bg-[var(--color-background)]">
                                     {(Object.keys(FilterSortByEnum) as Array<keyof typeof FilterSortByEnum>).filter((key) => Number.isNaN(+key)).map((x) => (
                                         <DropdownMenuRadioItem key={x} value={x}
@@ -90,21 +90,21 @@ export default function Search() {
                     </div>
 
                     <DialogTitle>Media</DialogTitle>
-                    <Button onClick={() => { filter.media.photos.value = !filter.media.photos.value; emptyMedia() }}
-                        className={`flex flex-row gap-1 ${filter.media.photos.value ? "bg-[var(--color-foreground)] text-[var(--color-background)]" : "bg-[var(--color-background)] not-hover:text-[var(--color-foreground)]"}`}>
-                        {filter.media.photos.value ? <FaCheck /> : <FaX />}
+                    <Button onClick={() => { filterSignal.media.photos.value = !filterSignal.media.photos.value; emptyMedia() }}
+                        className={`flex flex-row gap-1 ${filterSignal.media.photos.value ? "bg-[var(--color-foreground)] text-[var(--color-background)]" : "bg-[var(--color-background)] not-hover:text-[var(--color-foreground)]"}`}>
+                        {filterSignal.media.photos.value ? <FaCheck /> : <FaX />}
                         Photos
                     </Button>
-                    <Button onClick={() => { filter.media.videos.value = !filter.media.videos.value; emptyMedia() }}
-                        className={`flex flex-row gap-1 ${filter.media.videos.value ? "bg-[var(--color-foreground)] text-[var(--color-background)]" : "bg-[var(--color-background)] not-hover:text-[var(--color-foreground)]"}`}>
-                        {filter.media.videos.value ? <FaCheck /> : <FaX />}
+                    <Button onClick={() => { filterSignal.media.videos.value = !filterSignal.media.videos.value; emptyMedia() }}
+                        className={`flex flex-row gap-1 ${filterSignal.media.videos.value ? "bg-[var(--color-foreground)] text-[var(--color-background)]" : "bg-[var(--color-background)] not-hover:text-[var(--color-foreground)]"}`}>
+                        {filterSignal.media.videos.value ? <FaCheck /> : <FaX />}
                         Videos
                     </Button>
                     <Separator />
                     <Button variant="secondary" type="reset" onClick={reset}>Reset</Button>
                 </DialogContent>
             </Dialog>
-            <Input type="search" name="search" placeholder="Search" autoComplete="off" onChange={(e) => filter.search.value = e.target.value}/>
+            <Input type="search" name="search" placeholder="Search" autoComplete="off" onChange={(e) => filterSignal.search.value = e.target.value}/>
             <Button type="submit" variant="outline"><FaMagnifyingGlass className="bg-[var(--color-background)] text-[var(--color-foreground)]" /></Button>
         </form>
     )

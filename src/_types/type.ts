@@ -58,6 +58,7 @@ export type Filter = {
     sortBy: Signal<FilterSortBy>
     search: Signal<string>
     size: Signal<string>
+    albums: Signal<string[]>
 }
 
 export type FilterPrimative = {
@@ -69,4 +70,5 @@ export type FilterPrimative = {
     sortBy: FilterSortBy
     search: string
     size: string
+    albums: string[]
 }

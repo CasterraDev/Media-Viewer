@@ -2,7 +2,7 @@
 
 import { getMedias } from "@/actions/getMedia";
 import { filterTypeToPrimative, getMediaSizing } from "@/utils/clientUtil";
-import { filter, mediaList, mediaNotFinished, mediaOffset, mediaPresentIdx, mediaSelectList } from "@/utils/signals";
+import { filterSignal, mediaList, mediaNotFinished, mediaOffset, mediaPresentIdx, mediaSelectList } from "@/utils/signals";
 import { useSignals } from "@preact/signals-react/runtime";
 import { Suspense, useEffect, useRef, useState } from "react";
 import { useInView } from "react-intersection-observer";
@@ -13,7 +13,6 @@ import MediaPresent from "./MediaPresent";
 import { Show } from "@preact/signals-react/utils";
 import { Album, Media } from "@/db/types";
 import { getAllAlbums } from "@/actions/getAllAlbums";
-import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "./ui/dialog";
 import AlbumCommand from "./AlbumCommand";
 import { setMediasToAlbum } from "@/actions/setMediasToAlbum";
 import { PiSelectionForeground } from "react-icons/pi";
@@ -24,9 +23,10 @@ type MediaLoaderType = {
     reset?: boolean
     filter?: FilterPrimative
     sizeScale?: number
+    loadMoreMedia?: () => void
 }
 
-export default function MediaLoader(props: MediaLoaderType) {
+export default function MediaLoader({gridCols, reset, filter, sizeScale, loadMoreMedia}: MediaLoaderType) {
     useSignals();
 
     const { ref, inView } = useInView()
@@ -37,10 +37,10 @@ export default function MediaLoader(props: MediaLoaderType) {
     async function loadMoreMedias() {
         let f;
         let mediaCnt = 10;
-        if (!props.filter) {
-            f = filterTypeToPrimative(filter);
+        if (!filter) {
+            f = filterTypeToPrimative(filterSignal);
         } else {
-            f = props.filter
+            f = filter
         }
         const apiMedias = await getMedias(mediaOffset.value, mediaCnt, f)
         console.log(apiMedias)
@@ -65,14 +65,18 @@ export default function MediaLoader(props: MediaLoaderType) {
         }
         fun();
 
-        if (props.reset) {
+        if (reset) {
             emptyMedia();
         }
     }, [])
 
     useEffect(() => {
         if (inView && mediaNotFinished.value) {
-            loadMoreMedias()
+            if (loadMoreMedia) {
+                loadMoreMedia();
+            } else {
+                loadMoreMedias()
+            }
         }
     }, [inView])
 
@@ -122,9 +126,9 @@ export default function MediaLoader(props: MediaLoaderType) {
         };
     }, [])
 
-    async function albumSelect(album: Album & {thumbnail: Media}){
+    async function albumSelect(album: Album & { thumbnail: Media }) {
         let arr = []
-        for (let x in mediaSelectList.value){
+        for (let x in mediaSelectList.value) {
             arr.push(mediaSelectList.value[x].id)
         }
         await setMediasToAlbum(album.id, arr)
@@ -136,18 +140,18 @@ export default function MediaLoader(props: MediaLoaderType) {
                 <div className="sticky top-[var(--topBarHeight)] w-full h-10 z-50 px-4 flex flex-row gap-2">
                     <p>{mediaSelectList.value.length} Selected</p>
                     <div className="grow" />
-                    <AlbumCommand onAlbumSelect={albumSelect} listClassname="grid grid-cols-4" contentClassname="w-[80vw]"/>
+                    <AlbumCommand onAlbumSelect={albumSelect} listClassname="grid grid-cols-4" contentClassname="w-[80vw]" />
                     <Button onClick={() => { mediaSelectList.value = [] }}><PiSelectionSlash /></Button>
                     <Button onClick={() => { mediaSelectList.value = mediaList.value }}><PiSelectionForeground /></Button>
                 </div>
             }
             <div className={`grid w-full h-full`}
-                style={{ "gridTemplateColumns": `repeat(${props.gridCols || 4}, minmax(0, 1fr))` }}>
+                style={{ "gridTemplateColumns": `repeat(${gridCols || 4}, minmax(0, 1fr))` }}>
                 {mediaList.value.map((m, i) => (
                     <Suspense key={`Media-Loader-${m.id}-${i}`}>
                         <MediaShow media={m} idx={i} dimensionType={getMediaSizing(m.mediaWidth, m.mediaHeight)}
                             onClick={() => { setTabIdx(i) }} onMediaSelect={selectClick} selected={mediaSelectList.value.includes(mediaList.value[i])}
-                            sizeScale={props.sizeScale} onMedia={mediaClick} focus={i == tabIdx} />
+                            sizeScale={sizeScale} onMedia={mediaClick} focus={i == tabIdx} />
                     </Suspense>
                 ))}
             </div>
@@ -159,7 +163,7 @@ export default function MediaLoader(props: MediaLoaderType) {
             <Show when={mediaNotFinished}>
                 <div className="flex flex-col justify-center mt-20 gap-3">
                     <div ref={ref} className="w-fit mx-auto p-5 border-1 rounded-lg">Loading...</div>
-                    <Button onClick={loadMoreMedias} className="w-fit mx-auto p-5 border-1 rounded-lg">Load More</Button>
+                    <Button onClick={() => { if (loadMoreMedia) { loadMoreMedia(); } else { loadMoreMedias() } }} className="w-fit mx-auto p-5 border-1 rounded-lg">Load More</Button>
                 </div>
             </Show>
         </div>

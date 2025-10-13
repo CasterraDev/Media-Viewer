@@ -9,7 +9,7 @@ export let mediaNotFinished: Signal<boolean> = signal(true)
 export let mediaOffset: Signal<number> = signal(0)
 export let mediaPresentIdx: Signal<number | null> = signal(null)
 
-export const filter: Filter = {
+export const filterSignal: Filter = {
     media: {
         photos: signal(true),
         videos: signal(true)
@@ -17,5 +17,6 @@ export const filter: Filter = {
     sorting: signal("ascending"),
     sortBy: signal("created"),
     search: signal(""),
-    size: signal("")
+    size: signal(""),
+    albums: signal([])
 }

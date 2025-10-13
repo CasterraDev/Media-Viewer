@@ -8,20 +8,25 @@ export async function GET(
 ) {
     try {
         const albumID = req.nextUrl.searchParams.get("id");
-        const withThumbanil = req.nextUrl.searchParams.get("withThumbanil");
+        const withThumbanil = req.nextUrl.searchParams.get("withThumbanil")?.toString();
+        const withMedias = req.nextUrl.searchParams.get("withMedias")?.toString();
 
         if (!albumID) throw new Error("Failed to get album");
         let a;
-        if (withThumbanil){
-            a = await db.query.album.findFirst({
-                where: eq(album.id, albumID),
-                with: {
-                    thumbnail: true
-                }
-            })
-        }else{
-            a = (await db.select().from(album).where(eq(album.id, albumID)).limit(1))[0]
+
+        let p: Parameters<typeof db['query']['album']['findFirst']>[0] = {
+            where: eq(album.id, albumID),
         }
+
+        if (withThumbanil == "true" && withMedias == "true"){
+            p.with = {thumbnail: true, medias: {with:{media: true}}}
+        }else if (withThumbanil == "true"){
+            p.with = {thumbnail: true}
+        }else if (withMedias == "true"){
+            p.with = {medias: {with:{media: true}}}
+        }
+
+        a = await db.query.album.findFirst(p)
 
         return NextResponse.json(a, { status: 200 });
     } catch (err: unknown) {

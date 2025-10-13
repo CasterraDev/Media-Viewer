@@ -33,6 +33,7 @@ import { RiExpandUpDownLine } from "react-icons/ri";
 import { useRouter } from "next/navigation"
 import { LuAlbum } from "react-icons/lu";
 import AlbumCommand from "./AlbumCommand"
+import { album } from "@/db/schema"
 
 function close() {
     document.body.classList.remove("overflow-x-hidden")
