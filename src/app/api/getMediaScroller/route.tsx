@@ -42,10 +42,10 @@ export async function GET(
 
         const medias = await db.query.media.findMany({
             where: and(
-                mediaTypesParam ? inArray(media.mediaType, mediaTypesParam) : undefined,
-                albumsParam ? inArray(media.id,
-                    db.select({ mediaID: mediasToAlbums.mediaID }).from(mediasToAlbums).where(inArray(mediasToAlbums.albumID, albumsParam))
-                ) : undefined,
+                mediaTypesParam.length > 0 ? inArray(media.mediaType, mediaTypesParam) : undefined,
+                albumsParam.length > 0 ? inArray(media.id,
+                                      db.select({ mediaID: mediasToAlbums.mediaID }).from(mediasToAlbums).where(inArray(mediasToAlbums.albumID, albumsParam))
+                                     ) : undefined,
                 afterDateParam ? gt(media.mediaCreatedAt, afterDateParam) : undefined,
                 beforeDateParam ? lt(media.mediaCreatedAt, beforeDateParam) : undefined,
                 sizeParam ? lt(media.mediaSize, sizeParam) : undefined,
