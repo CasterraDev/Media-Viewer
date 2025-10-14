@@ -1,7 +1,7 @@
 "use client"
 
 import { getAllAlbums } from "@/actions/getAllAlbums";
-import AlbumThumb from "@/app/albums/AlbumThumb";
+import AlbumThumb from "@/components/AlbumThumb";
 import { Album, Media } from "@/db/types";
 import { useEffect, useState } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
@@ -55,7 +55,7 @@ export default function AlbumCommand({ shouldDisable, onAlbumSelect, onlyTitle, 
                                                 {onlyTitle ?
                                                     <p>{album.title}</p>
                                                     :
-                                                    <AlbumThumb album={album} />
+                                                    <AlbumThumb curAlbum={album} />
                                                 }
                                             </CommandItem>
                                         ))}

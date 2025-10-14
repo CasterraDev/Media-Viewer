@@ -22,10 +22,25 @@ export function secsIntoData(totalSeconds: number): { hours: number, minutes: nu
 export function secsIntoHexidecmal(totalSeconds: number): string {
     let data = secsIntoData(totalSeconds);
     let str = ``;
-    if (data.hours != 0){
+    if (data.hours != 0) {
         str.concat(`${data.hours.toString().padStart(2, "0")}:`)
     }
     return `${str}${data.minutes.toString().padStart(2, "0")}:${data.seconds.toString().padStart(2, "0")}`
+}
+
+
+export function getDefaultFilterPrimative(): FilterPrimative {
+    return {
+        media: {
+            photos: true,
+            videos: true
+        },
+        sorting: "ascending",
+        sortBy: "created",
+        search: "",
+        size: "",
+        albums: []
+    }
 }
 
 export function filterTypeToPrimative(filter: Filter): FilterPrimative {

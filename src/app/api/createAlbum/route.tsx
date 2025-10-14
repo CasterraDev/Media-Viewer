@@ -13,7 +13,8 @@ export async function POST(
         await db.transaction(async (tx) => {
             const al = await db.insert(album).values({
                 title: body.title || null,
-                description: body.description || null
+                description: body.description || null,
+                thumbnailID: body.thumbnailID || null
             }).returning({ id: album.id }).onConflictDoNothing()
 
             if (!(!body.mediaIDs || body.mediaIDs.length == 0)) {

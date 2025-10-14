@@ -42,7 +42,7 @@ function close() {
 }
 
 export default function MediaPresent({ mediaAlbums, mediaIdx, allAlbums, ...props }: { mediaAlbums: MediaAlbums, mediaIdx: number, allAlbums?: Album[] } & React.ComponentProps<"div">) {
-    const [media, setmedia] = useState<MediaAlbums>(mediaAlbums);
+    const [media, setMedia] = useState<MediaAlbums>(mediaAlbums);
     console.log(mediaAlbums);
     const { userPrefs, updateUserPrefs } = useUserPrefs("settings");
     const [albumComboboxOpen, setAlbumComboboxOpen] = useState<boolean>(false);
@@ -62,6 +62,7 @@ export default function MediaPresent({ mediaAlbums, mediaIdx, allAlbums, ...prop
                 mediaPresentIdx.value = idx + 1;
             }
         }
+        setMedia(mediaList.value[mediaPresentIdx?.value || 0])
         document.getElementById(`Media-Show-${media.id}`)?.scrollIntoView();
     }
 
@@ -99,6 +100,7 @@ export default function MediaPresent({ mediaAlbums, mediaIdx, allAlbums, ...prop
     }
 
     function keyDownHandler(e: KeyboardEvent) {
+        console.log("Present" + e.code)
         if (e.code == 'Escape' || e.code == 'ControlRight') {
             close()
         } else if (e.code == 'ArrowRight') {

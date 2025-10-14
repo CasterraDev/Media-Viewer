@@ -36,7 +36,7 @@ export default function MediaShow(
         if (!mediaST) return;
         if (mediaST.mediaType.includes("photos")) {
             return (
-                <button className="group relative w-full h-fit">
+                <div className="group relative w-full h-fit">
                     <Image
                         alt={`${media.title || media.mediaFilename}`}
                         src={`/api/getMedia?mediaID=${media.id}`}
@@ -53,11 +53,11 @@ export default function MediaShow(
                         <div className={`group-hover:block w-4 aspect-square border-2 border-white rounded-sm ${selected ? "bg-white" : "hidden"}`}
                             onClick={() => { if (onMediaSelect) onMediaSelect(idx) }} />
                     </div>
-                </button>
+                </div>
             )
         } else {
             return (
-                <button
+                <div
                     className="group relative w-full h-fit">
                     <video preload="metadata" playsInline={true} onClick={() => { if (onMedia) onMedia(idx) }}>
                         <source src={`/api/getMedia?mediaID=${media.id}`} />
@@ -70,7 +70,7 @@ export default function MediaShow(
                         <p>{secsIntoHexidecmal(media.mediaDurationInSecs || 0)}</p>
                         <FaPlay className="m-auto" />
                     </div>
-                </button>
+                </div>
             )
         }
     }

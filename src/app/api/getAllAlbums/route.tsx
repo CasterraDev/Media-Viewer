@@ -8,9 +8,6 @@ export async function GET(
 ) {
     try {
         let a = await db.query.album.findMany({
-            with: {
-                thumbnail: true
-            }
         })
         return NextResponse.json({ albums: a }, { status: 200 });
     } catch (err: unknown) {

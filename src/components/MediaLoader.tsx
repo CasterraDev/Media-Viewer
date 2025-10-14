@@ -24,9 +24,10 @@ type MediaLoaderType = {
     filter?: FilterPrimative
     sizeScale?: number
     loadMoreMedia?: () => void
+    mediaClick?: (idx: number) => void
 }
 
-export default function MediaLoader({gridCols, reset, filter, sizeScale, loadMoreMedia}: MediaLoaderType) {
+export default function MediaLoader({ gridCols, reset, filter, sizeScale, loadMoreMedia, mediaClick, ...props }: MediaLoaderType & React.HTMLAttributes<"div">) {
     useSignals();
 
     const { ref, inView } = useInView()
@@ -80,7 +81,7 @@ export default function MediaLoader({gridCols, reset, filter, sizeScale, loadMor
         }
     }, [inView])
 
-    function mediaClick(idx: number) {
+    function mediaClickDef(idx: number) {
         mediaPresentIdx.value = idx
     }
 
@@ -113,7 +114,11 @@ export default function MediaLoader({gridCols, reset, filter, sizeScale, loadMor
                 return prev - 1;
             });
         } else if (e.code === "ControlRight") {
-            mediaClick(tabIdxRef.current)
+            if (mediaClick) {
+                mediaClick(tabIdxRef.current)
+            } else {
+                mediaClickDef(tabIdxRef.current)
+            }
         }
     }
 
@@ -151,7 +156,7 @@ export default function MediaLoader({gridCols, reset, filter, sizeScale, loadMor
                     <Suspense key={`Media-Loader-${m.id}-${i}`}>
                         <MediaShow media={m} idx={i} dimensionType={getMediaSizing(m.mediaWidth, m.mediaHeight)}
                             onClick={() => { setTabIdx(i) }} onMediaSelect={selectClick} selected={mediaSelectList.value.includes(mediaList.value[i])}
-                            sizeScale={sizeScale} onMedia={mediaClick} focus={i == tabIdx} />
+                            sizeScale={sizeScale} onMedia={(idx) => mediaClick ? mediaClick(idx) : mediaClickDef(idx)} focus={i == tabIdx} />
                     </Suspense>
                 ))}
             </div>
