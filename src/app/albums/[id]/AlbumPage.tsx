@@ -5,7 +5,7 @@ import { getAlbum } from "@/actions/getAlbum";
 import { getMedias } from "@/actions/getMedia";
 import MediaLoader from "@/components/MediaLoader";
 import { InferQueryModel } from "@/db/types";
-import { convertSignalToPrimative, filterTypeToPrimative } from "@/utils/clientUtil";
+import { convertSignalToPrimative } from "@/utils/clientUtil";
 import { filterSignal, mediaList, mediaNotFinished, mediaOffset } from "@/utils/signals";
 import { useEffect, useState } from "react";
 
@@ -34,11 +34,10 @@ export default function AlbumPage({ id }: { id: string }) {
         mediaOffset.value += mediaCnt;
     }
 
-
     return (
         <div className="p-4">
             <h1 className="text-4xl">{album?.title}</h1>
-            <MediaLoader reset={true} loadMoreMedia={loadMoreMedias} sizeScale={.20}/>
+            <MediaLoader reset={true} loadMoreMedia={loadMoreMedias} sizeScale={.20} selectable={true}/>
         </div>
     )
 }
