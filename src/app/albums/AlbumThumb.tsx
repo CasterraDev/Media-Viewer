@@ -9,6 +9,7 @@ import { BsThreeDotsVertical } from "react-icons/bs";
 import Loading from "@/components/Loading";
 import { changeAlbum } from "@/actions/changeAlbum";
 import AlbumChangeForm from "@/app/albums/AlbumChangeForm";
+import { deleteAlbum } from "@/actions/deleteAlbum";
 
 type AlbumThumbProps = {
     curAlbum: InferQueryModel<"album", { with: { thumbnail: true } }>
@@ -31,6 +32,12 @@ export default function AlbumThumb({ curAlbum }: AlbumThumbProps) {
         });
     }
 
+    async function deleteAlbumFunc(id: string){
+        await deleteAlbum(id).then(() => {
+            location.reload();
+        });
+    }
+
     return (
         <div className="group flex flex-col w-fit h-fit">
             <div className="relative w-40 h-fit">
@@ -49,7 +56,7 @@ export default function AlbumThumb({ curAlbum }: AlbumThumbProps) {
                                         Make changes to your album here.
                                     </DialogDescription>
                                 </DialogHeader>
-                                <AlbumChangeForm formID="change-album-form" album={curAlbum} />
+                                <AlbumChangeForm formID="change-album-form" album={curAlbum} deleteCallback={deleteAlbumFunc}/>
                             </form>
                         </DialogContent>
                     </Dialog>
