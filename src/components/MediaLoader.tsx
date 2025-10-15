@@ -1,7 +1,7 @@
 "use client"
 
 import { getMedias } from "@/actions/getMedia";
-import { filterTypeToPrimative, getMediaSizing } from "@/utils/clientUtil";
+import { convertSignalToPrimative, filterTypeToPrimative, getMediaSizing } from "@/utils/clientUtil";
 import { filterSignal, mediaList, mediaNotFinished, mediaOffset, mediaPresentIdx, mediaSelectList } from "@/utils/signals";
 import { useSignals } from "@preact/signals-react/runtime";
 import { Suspense, useEffect, useRef, useState } from "react";
@@ -23,23 +23,25 @@ type MediaLoaderType = {
     reset?: boolean
     filter?: FilterPrimative
     sizeScale?: number
+    selectable?: boolean
     loadMoreMedia?: () => void
     mediaClick?: (idx: number) => void
 }
 
-export default function MediaLoader({ gridCols, reset, filter, sizeScale, loadMoreMedia, mediaClick, ...props }: MediaLoaderType & React.HTMLAttributes<"div">) {
+export default function MediaLoader({ gridCols, reset, filter, sizeScale, selectable, loadMoreMedia, mediaClick, ...props }: MediaLoaderType & React.HTMLAttributes<"div">) {
     useSignals();
 
     const { ref, inView } = useInView()
     const [allAlbums, setAllAlbums] = useState<Album[]>([])
     const [tabIdx, setTabIdx] = useState<number>(0)
     const tabIdxRef = useRef<number>(tabIdx)
+    const [infiniteView, setInfiniteView] = useState<boolean>(false)
 
     async function loadMoreMedias() {
         let f;
         let mediaCnt = 10;
         if (!filter) {
-            f = filterTypeToPrimative(filterSignal);
+            f = convertSignalToPrimative(filterSignal) as FilterPrimative;
         } else {
             f = filter
         }
@@ -155,7 +157,7 @@ export default function MediaLoader({ gridCols, reset, filter, sizeScale, loadMo
                 {mediaList.value.map((m, i) => (
                     <Suspense key={`Media-Loader-${m.id}-${i}`}>
                         <MediaShow media={m} idx={i} dimensionType={getMediaSizing(m.mediaWidth, m.mediaHeight)}
-                            onClick={() => { setTabIdx(i) }} onMediaSelect={selectClick} selected={mediaSelectList.value.includes(mediaList.value[i])}
+                            onClick={() => { setTabIdx(i) }} onMediaSelect={selectClick} selected={mediaSelectList.value.includes(mediaList.value[i])} notSelectable={!selectable || false}
                             sizeScale={sizeScale} onMedia={(idx) => mediaClick ? mediaClick(idx) : mediaClickDef(idx)} focus={i == tabIdx} />
                     </Suspense>
                 ))}

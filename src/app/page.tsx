@@ -4,7 +4,7 @@ export default function Home() {
     console.log("Home")
     return (
         <div className="flex flex-col">
-            <MediaLoader sizeScale={.20} reset={true}/>
+            <MediaLoader sizeScale={.20} reset={true} selectable={true}/>
         </div>
     );
 }

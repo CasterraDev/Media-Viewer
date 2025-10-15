@@ -13,6 +13,7 @@ type MediaShowType = {
     sizeScale?: number
     onMedia?: (idx: number) => void
     onMediaSelect?: (idx: number) => void
+    notSelectable?: boolean
     selected?: boolean
     focus?: boolean
 }
@@ -26,6 +27,7 @@ export default function MediaShow(
         sizeScale,
         onMedia,
         onMediaSelect,
+        notSelectable,
         selected,
         focus,
         ...props
@@ -36,7 +38,7 @@ export default function MediaShow(
         if (!mediaST) return;
         if (mediaST.mediaType.includes("photos")) {
             return (
-                <div className="group relative w-full h-fit">
+                <div className="group relative w-full h-fit cursor-pointer">
                     <Image
                         alt={`${media.title || media.mediaFilename}`}
                         src={`/api/getMedia?mediaID=${media.id}`}
@@ -49,16 +51,18 @@ export default function MediaShow(
                         width={500}
                         height={300}
                     />
+                    {!notSelectable &&
                     <div className="absolute top-0 left-0 z-10 m-1 flex flex-row gap-1">
                         <div className={`group-hover:block w-4 aspect-square border-2 border-white rounded-sm ${selected ? "bg-white" : "hidden"}`}
                             onClick={() => { if (onMediaSelect) onMediaSelect(idx) }} />
                     </div>
+                    }
                 </div>
             )
         } else {
             return (
                 <div
-                    className="group relative w-full h-fit">
+                    className="group relative w-full h-fit cursor-pointer">
                     <video preload="metadata" playsInline={true} onClick={() => { if (onMedia) onMedia(idx) }}>
                         <source src={`/api/getMedia?mediaID=${media.id}`} />
                     </video>

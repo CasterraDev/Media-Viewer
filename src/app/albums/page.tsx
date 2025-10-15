@@ -1,4 +1,4 @@
-import AlbumGrid from "@/components/AlbumGrid";
+import AlbumGrid from "@/app/albums/AlbumGrid";
 
 export default function page() {
     return (

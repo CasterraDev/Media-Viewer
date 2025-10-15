@@ -1,7 +1,7 @@
 "use client"
 
 import { getAllAlbums } from "@/actions/getAllAlbums";
-import AlbumThumb from "@/components/AlbumThumb";
+import AlbumThumb from "@/app/albums/AlbumThumb";
 import { Album, Media } from "@/db/types";
 import { useEffect, useState } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";

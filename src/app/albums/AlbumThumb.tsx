@@ -7,8 +7,8 @@ import Link from "next/link";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import Loading from "@/components/Loading";
-import AlbumChangeForm from "./AlbumChangeForm";
 import { changeAlbum } from "@/actions/changeAlbum";
+import AlbumChangeForm from "@/app/albums/AlbumChangeForm";
 
 type AlbumThumbProps = {
     curAlbum: InferQueryModel<"album", { with: { thumbnail: true } }>

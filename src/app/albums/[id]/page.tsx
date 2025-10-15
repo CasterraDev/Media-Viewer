@@ -1,4 +1,4 @@
-import AlbumPage from "@/components/AlbumPage"
+import AlbumPage from "@/app/albums/[id]/AlbumPage"
 
 export default async function Page({
     params,

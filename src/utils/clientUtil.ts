@@ -1,4 +1,24 @@
-import { Filter, FilterPrimative, MediaSizing } from "@/_types/type";
+import { Filter, MediaSizing, SignalToPrimative } from "@/_types/type";
+import { Signal } from "@preact/signals-react";
+function createPair<S, T>(v1: S, v2: T): [S, T] {
+  return [v1, v2];
+}
+
+export function convertSignalToPrimative<T extends Record<string, any>>(obj: T): SignalToPrimative<T>{
+    let o: any = {}
+    for (var key of Object.keys(obj)) {
+        let val = obj[key];
+
+        if (val instanceof Signal){
+            o[key] = val.value;
+            continue
+        }
+        if (typeof val === 'object' && !Array.isArray(val) && val !== null) {
+            o[key] = convertSignalToPrimative(val);
+        }
+    }
+    return o as SignalToPrimative<T>
+}
 
 export function getMediaSizing(width: number, height: number): MediaSizing {
     if (width == height) {

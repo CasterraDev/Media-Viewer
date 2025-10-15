@@ -1,8 +1,7 @@
 "use client"
 import { getAllAlbums } from "@/actions/getAllAlbums";
-import { Album, InferQueryModel, Media } from "@/db/types"
+import { InferQueryModel } from "@/db/types"
 import { useEffect, useState } from "react"
-
 import {
     Dialog,
     DialogContent,

@@ -33,7 +33,8 @@ export type UserPrefs = {
     sortType: string,
     mediaRoots: string[],
     mediaLoop: boolean,
-    mediaAutoplay: boolean
+    mediaAutoplay: boolean,
+    savedFilter: FilterPrimative
 }
 
 export type MediaTypes = {
@@ -41,16 +42,10 @@ export type MediaTypes = {
     videos: Signal<boolean>
 }
 
-export type FilterSorting = "ascending" | "descending" | "random"
-export type FilterSortBy = "created" | "modified" | "size"
-
-export enum FilterSortingEnum {
-    "ascending", "descending", "random"
-}
-
-export enum FilterSortByEnum {
-    "created", "modified", "size"
-}
+export const FilterSortingArray = ["ascending", "descending", "random"] as const;
+type FilterSorting = typeof FilterSortingArray[number];
+export const FilterSortByArray = ["created", "modified", "size"] as const;
+type FilterSortBy = typeof FilterSortByArray[number];
 
 export type Filter = {
     media: MediaTypes,
@@ -61,14 +56,12 @@ export type Filter = {
     albums: Signal<string[]>
 }
 
-export type FilterPrimative = {
-    media: {
-        photos: boolean,
-        videos: boolean
-    },
-    sorting: FilterSorting
-    sortBy: FilterSortBy
-    search: string
-    size: string
-    albums: string[]
-}
+export type SignalToPrimative<ObjectType extends object> =
+    { [Key in keyof ObjectType]: ObjectType[Key] extends Signal
+        ? ObjectType[Key]['value']
+        : ObjectType[Key] extends Object
+        ? SignalToPrimative<ObjectType[Key]>
+        : Key
+    };
+
+export type FilterPrimative = SignalToPrimative<Filter>

@@ -1,11 +1,13 @@
 import { UserPrefs } from "@/_types/type";
+import { getDefaultFilterPrimative } from "@/utils/clientUtil";
 import { useEffect, useState } from "react";
 
 const defaultUserPrefs: UserPrefs = {
   sortType: "",
   mediaRoots: [],
   mediaLoop: false,
-  mediaAutoplay: false
+  mediaAutoplay: false,
+  savedFilter: getDefaultFilterPrimative()
 }
 
 const getLocalStorage = (key: string): UserPrefs => {

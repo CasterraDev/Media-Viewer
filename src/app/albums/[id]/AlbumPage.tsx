@@ -1,15 +1,15 @@
 "use client"
 
+import { FilterPrimative } from "@/_types/type";
 import { getAlbum } from "@/actions/getAlbum";
 import { getMedias } from "@/actions/getMedia";
 import MediaLoader from "@/components/MediaLoader";
-import { Album, InferQueryModel, Media } from "@/db/types";
-import { filterTypeToPrimative } from "@/utils/clientUtil";
+import { InferQueryModel } from "@/db/types";
+import { convertSignalToPrimative, filterTypeToPrimative } from "@/utils/clientUtil";
 import { filterSignal, mediaList, mediaNotFinished, mediaOffset } from "@/utils/signals";
 import { useEffect, useState } from "react";
 
 export default function AlbumPage({ id }: { id: string }) {
-
     const [album, setAlbum] = useState<InferQueryModel<"album", {with: {thumbnail: true, medias: {with:{media: true}}}}>>();
 
     useEffect(() => {
@@ -22,7 +22,7 @@ export default function AlbumPage({ id }: { id: string }) {
     async function loadMoreMedias() {
         let f;
         let mediaCnt = 10;
-        f = filterTypeToPrimative(filterSignal);
+        f = convertSignalToPrimative(filterSignal) as FilterPrimative;
         f.albums = [id]
         const apiMedias = await getMedias(mediaOffset.value, mediaCnt, f)
         console.log(apiMedias)

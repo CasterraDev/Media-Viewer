@@ -1,5 +1,4 @@
 "use client"
-import { FilterPrimative } from "@/_types/type";
 import { getMedias } from "@/actions/getMedia";
 import MediaLoader from "@/components/MediaLoader";
 import Search from "@/components/Search";
@@ -7,12 +6,13 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Album } from "@/db/types";
-import { filterTypeToPrimative, getDefaultFilterPrimative } from "@/utils/clientUtil";
+import { convertSignalToPrimative, filterTypeToPrimative, getDefaultFilterPrimative } from "@/utils/clientUtil";
 import { filterSignal, mediaList, mediaNotFinished, mediaOffset } from "@/utils/signals";
 import { Suspense, useState } from "react";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import Image from "next/image";
 import Loading from "@/components/Loading";
+import { FilterPrimative } from "@/_types/type";
 
 export default function AlbumChangeForm({ formID, album }: { formID: string, album?: Album }) {
     const [thumbnailID, setThumbnailID] = useState<string | null>(null);
@@ -21,7 +21,7 @@ export default function AlbumChangeForm({ formID, album }: { formID: string, alb
     async function loadMedia() {
         let f;
         let mediaCnt = 10;
-        f = filterTypeToPrimative(filterSignal);
+        f = convertSignalToPrimative(filterSignal) as FilterPrimative;
         f.size = "100000"
         f.media = { photos: true, videos: false }
         const apiMedias = await getMedias(mediaOffset.value, mediaCnt, f)
@@ -38,20 +38,6 @@ export default function AlbumChangeForm({ formID, album }: { formID: string, alb
         setThumbnailID(mediaList.value[idx].id);
         setThumbnailOpen(false);
     }
-    // <Dialog open={thumbnailOpen} onOpenChange={setThumbnailOpen}>
-    //     <DialogTrigger asChild>
-    //         <Button size={"sm"}>Change</Button>
-    //     </DialogTrigger>
-    //     <DialogContent className="max-w-full">
-    //         <DialogHeader>
-    //             <DialogTitle>Select Album Thumbnail</DialogTitle>
-    //         </DialogHeader>
-    //         <div className="scroll-auto max-h-[80vh] overflow-scroll">
-    //             <Search />
-    //             <MediaLoader reset={true} loadMoreMedia={loadMedia} mediaClick={mediaClick} />
-    //         </div>
-    //     </DialogContent>
-    // </Dialog>
 
     return (
             <div className="grid gap-4 w-full">
@@ -80,7 +66,7 @@ export default function AlbumChangeForm({ formID, album }: { formID: string, alb
                                 </DialogHeader>
                                 <div className="scroll-auto max-h-[80vh] overflow-scroll">
                                     <Search />
-                                    <MediaLoader reset={true} loadMoreMedia={loadMedia} mediaClick={mediaClick} />
+                                    <MediaLoader reset={true} loadMoreMedia={loadMedia} mediaClick={mediaClick} selectable={false}/>
                                 </div>
                             </DialogContent>
                         </Dialog>
