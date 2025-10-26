@@ -1,8 +1,5 @@
-import { Filter, MediaSizing, SignalToPrimative } from "@/_types/type";
+import { Filter, FilterPrimative, MediaSizing, SignalToPrimative } from "@/_types/type";
 import { Signal } from "@preact/signals-react";
-function createPair<S, T>(v1: S, v2: T): [S, T] {
-  return [v1, v2];
-}
 
 export function convertSignalToPrimative<T extends Record<string, any>>(obj: T): SignalToPrimative<T>{
     let o: any = {}

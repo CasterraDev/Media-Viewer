@@ -108,6 +108,8 @@ const uploadFiles = async (filepath: string, mediaRoot: string): Promise<Promise
                     pf.errorFiles.push({ file: root + dir + name, reason: error.cause });
                     // console.log(`Error Occurred: ${error} File: ${file} MT: ${mimeType}`)
                     // console.log((error as any).cause.code)
+                }else{
+                    console.log(error);
                 }
             }
         }

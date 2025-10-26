@@ -1,7 +1,6 @@
 import { MediaType } from "@/_types/type";
 import { exec } from "child_process";
 import { createReadStream, ReadStream } from "fs";
-var assert = require('assert');
 
 export const getType = (mimeType: string): MediaType => {
     if (mimeType.includes("image")) {
@@ -31,45 +30,33 @@ export const getType = (mimeType: string): MediaType => {
 
 export const getVideoData = (filename: string): Promise<{ width: number, height: number, durationInSecs: number }> => {
     return new Promise((resolve, reject) => {
-        exec(`ffprobe -v error -of flat=s=_ -select_streams v:0 -show_entries stream=height,width -show_entries format=duration "${filename}"`, (error, stdout, stderr) => {
-            if (error || stderr){
-                reject(`Error occurred ${stderr}`)
-            }
-            console.log(stdout)
-            var width = /width=(\d+)/.exec(stdout);
-            var height = /height=(\d+)/.exec(stdout);
-            var duration = /duration="([\d\.]+)"/.exec(stdout);
-            console.log(duration)
-            assert(width && height, 'No dimensions found!');
-            if (width == null || height == null || !duration) {
-                reject(`Error occurred ${stderr}`)
-            }
-            resolve({
-                width: parseInt((width as any)[1]),
-                height: parseInt((height as any)[1]),
-                durationInSecs: parseInt((duration as any)[1])
-            })
-        });
-    });
-}
-
-export const getVideoDuration = (video: HTMLVideoElement): Promise<number> => {
-    return new Promise((resolve, reject) => {
         try {
-            video.addEventListener("loadeddata", function() {
-                resolve(video.duration);
+            exec(`ffprobe -v error -of flat=s=_ -select_streams v:0 -show_entries stream=height,width -show_entries format=duration "${filename}"`, (error, stdout, stderr) => {
+                if (error || stderr) {
+                    reject({...error, stderr})
+                }
+                console.log(stdout)
+                var width = /width=(\d+)/.exec(stdout);
+                var height = /height=(\d+)/.exec(stdout);
+                var duration = /duration="([\d\.]+)"/.exec(stdout);
+                console.log(duration)
+                if (!(width && height)){
+                    reject(`No dimensions found! Filename: ${filename}`)
+                }
+                if (width == null || height == null || !duration) {
+                    reject(`Error occurred ${stderr}`)
+                }
+                resolve({
+                    width: parseInt((width as any)[1]),
+                    height: parseInt((height as any)[1]),
+                    durationInSecs: parseInt((duration as any)[1])
+                })
             });
-            video.preload = "metadata";
-            // Load video in Safari / IE11
-            video.muted = true;
-            video.playsInline = true;
-            video.play();
-            //  window.URL.revokeObjectURL(url);
         } catch (error) {
-            reject(error);
+            reject({...error as any, filename});
         }
     });
-};
+}
 
 // https://developer.mozilla.org/en-US/docs/Web/API/ReadableStream#convert_an_iterator_or_async_iterator_to_a_stream
 export function iteratorToStream(
