@@ -16,24 +16,11 @@ import { FaRegFile } from "react-icons/fa6";
 import { FaRegImage } from "react-icons/fa";
 import Link from "next/link"
 import { setMediasToAlbum } from "@/actions/setMediasToAlbum"
-import {
-    Command,
-    CommandEmpty,
-    CommandGroup,
-    CommandInput,
-    CommandItem,
-    CommandList,
-} from "@/components/ui/command"
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "@/components/ui/popover"
-import { RiExpandUpDownLine } from "react-icons/ri";
 import { useRouter } from "next/navigation"
 import { LuAlbum } from "react-icons/lu";
 import AlbumCommand from "./AlbumCommand"
-import { album } from "@/db/schema"
+import { CheckIcon, XIcon } from "lucide-react"
+import { changeMediaData } from "@/actions/changeMediaData"
 
 function close() {
     document.body.classList.remove("overflow-x-hidden")
@@ -45,12 +32,13 @@ export default function MediaPresent({ mediaAlbums, mediaIdx, allAlbums, ...prop
     const [media, setMedia] = useState<MediaAlbums>(mediaAlbums);
     console.log(mediaAlbums);
     const { userPrefs, updateUserPrefs } = useUserPrefs("settings");
-    const [albumComboboxOpen, setAlbumComboboxOpen] = useState<boolean>(false);
+    const [editTitle, setEditTitle] = useState<boolean>(false);
     const [info, setInfo] = useState<boolean>(false);
     const [loop, setLoop] = useState<boolean>(userPrefs.mediaLoop);
     const [autoplay, setAutoplay] = useState<boolean>(userPrefs.mediaAutoplay);
     const [hideControls, setHideControls] = useState<boolean>(false);
     const ref = useRef<HTMLDivElement>(null);
+    const titleRef = useRef<HTMLDivElement>(null);
     const [albumAddStatusDisabled, setAlbumAddStatusDisabled] = useState<boolean>(false);
     const router = useRouter();
 
@@ -134,6 +122,20 @@ export default function MediaPresent({ mediaAlbums, mediaIdx, allAlbums, ...prop
     }, [])
 
     useEffect(() => {
+        // Disable keybinds when editing the title
+        if (editTitle) {
+            document.removeEventListener("keydown", keyDownHandler);
+        } else {
+            document.addEventListener("keydown", keyDownHandler);
+        }
+
+        // clean up
+        return () => {
+            document.removeEventListener("keydown", keyDownHandler);
+        };
+    }, [editTitle])
+
+    useEffect(() => {
         updateUserPrefs({ mediaLoop: loop, mediaAutoplay: autoplay })
     }, [loop, autoplay])
 
@@ -165,13 +167,26 @@ export default function MediaPresent({ mediaAlbums, mediaIdx, allAlbums, ...prop
             }
             {info &&
                 <div className="absolute top-0 right-0 mt-15 w-90 h-[100vh] z-50 bg-background">
-                    <div className="flex flex-col gap-3 p-2 pl-5">
-                        <div className="flex flex-row gap-2">
-                            {media.title}
+                    <div className="flex flex-col gap-3 p-2 pl-5 w-full">
+                        <div>
+                            <div>Title</div>
+                            <div className="relative">
+                                <Button onClick={() => setEditTitle(!editTitle)} variant={"ghost"} className={`absolute top-0 right-0 ${editTitle && "hidden"}`}>Edit</Button>
+                                <div ref={titleRef} dangerouslySetInnerHTML={{ __html: media.title || "" }}
+                                    className="min-h-9 bg-secondary p-1 rounded-sm" contentEditable={editTitle}
+                                    translate="no" role="textbox">
+                                </div>
+                            </div>
+                            {editTitle &&
+                                <div className="flex flex-row justify-around pt-2">
+                                    <Button onClick={() => { if (titleRef.current) { titleRef.current.innerText = media.title || "" } setEditTitle(false) }}><XIcon /></Button>
+                                    <Button onClick={async () => { let m = await changeMediaData(media.id, titleRef.current?.innerText); setMedia(m); setEditTitle(false); }}><CheckIcon /></Button>
+                                </div>
+                            }
                         </div>
-                        <div className="flex flex-row gap-2">
+                        <div className="flex flex-row gap-2 h-fit">
                             <FaRegFile className={`w-auto h-full my-auto min-w-5`} />
-                            <Link href={`/api/getMedia?mediaID=${media.id}`} rel="noopener noreferrer" target="_blank">
+                            <Link className="break-words break-all" href={`/api/getMedia?mediaID=${media.id}`} rel="noopener noreferrer" target="_blank">
                                 {media.mediaFilename}
                             </Link>
                         </div>
@@ -179,9 +194,11 @@ export default function MediaPresent({ mediaAlbums, mediaIdx, allAlbums, ...prop
                             <FaRegImage className={`w-auto h-full my-auto min-w-5`} />
                             {media.mediaWidth} x {media.mediaHeight}
                         </div>
-                        <div className="flex flex-row gap-2">
+                        <div className="flex flex-row gap-2 break-words max-w-full">
                             <GoFileDirectory className={`w-auto h-full min-w-6`} />
-                            {media.mediaFilePath}
+                            <p className="w-full break-all">
+                                {media.mediaFilePath}
+                            </p>
                         </div>
                     </div>
                     <div className="pl-5">
@@ -191,7 +208,7 @@ export default function MediaPresent({ mediaAlbums, mediaIdx, allAlbums, ...prop
                                 <p className="flex flex-row gap-2" key={"Album-Present-Title-" + a.title + a.id}><LuAlbum className="w-auto h-auto" />{a.title}</p>
                             )
                         })}
-                        <AlbumCommand onlyTitle={true} onAlbumSelect={(a) => addMediaToAlbum(a.id)} listClassname="grid grid-cols-1" contentClassname="w-[10rem] p-1 max-h-[40rem] overflow-auto"/>
+                        <AlbumCommand shouldDisable={albumAddStatusDisabled} onlyTitle={true} onAlbumSelect={(a) => addMediaToAlbum(a.id)} listClassname="grid grid-cols-1" contentClassname="w-[10rem] p-1 max-h-[40rem] overflow-auto" />
                     </div>
                 </div>
             }
