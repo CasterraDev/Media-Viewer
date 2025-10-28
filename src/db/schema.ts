@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, index, varchar, uuid, numeric, decimal, integer, primaryKey } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, index, varchar, uuid, numeric, decimal, integer, primaryKey, boolean } from "drizzle-orm/pg-core";
 import { createUniqueId } from "./utils";
 import { relations } from "drizzle-orm";
 
@@ -10,8 +10,8 @@ export function enumToPgEnum<T extends Record<string, any>>(
 
 export const media = pgTable("Media", {
     id: uuid().$defaultFn(() => createUniqueId()).primaryKey(),
-    title: varchar("title", { length: 100 }),
-    description: varchar("description", { length: 5000 }),
+    title: text("title"),
+    description: text("description"),
     mediaType: text().notNull(),
     mediaMime: text().notNull(),
     mediaRoot: text().notNull(),
@@ -22,6 +22,7 @@ export const media = pgTable("Media", {
     mediaWidth: integer().notNull(),
     mediaHeight: integer().notNull(),
     mediaDurationInSecs: integer(),
+    mediaExifMatched: boolean(),
     mediaCreatedAt: timestamp("media_created_at", { mode: "string" }).notNull(),
     mediaUpdatedAt: timestamp("media_updated_at", { mode: "string" }).notNull(),
     createdAt: timestamp("created_at", { mode: "string" }).notNull().defaultNow(),

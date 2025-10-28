@@ -1,4 +1,5 @@
 import { MediaType } from "@/_types/type";
+import { FileError } from "@/errors/Files";
 import { exec } from "child_process";
 import { createReadStream, ReadStream } from "fs";
 
@@ -33,14 +34,14 @@ export const getVideoData = (filename: string): Promise<{ width: number, height:
         try {
             exec(`ffprobe -v error -of flat=s=_ -select_streams v:0 -show_entries stream=height,width -show_entries format=duration "${filename}"`, (error, stdout, stderr) => {
                 if (error || stderr) {
-                    reject({...error, stderr})
+                    reject({ ...error, stderr })
                 }
                 console.log(stdout)
                 var width = /width=(\d+)/.exec(stdout);
                 var height = /height=(\d+)/.exec(stdout);
                 var duration = /duration="([\d\.]+)"/.exec(stdout);
                 console.log(duration)
-                if (!(width && height)){
+                if (!(width && height)) {
                     reject(`No dimensions found! Filename: ${filename}`)
                 }
                 if (width == null || height == null || !duration) {
@@ -53,7 +54,33 @@ export const getVideoData = (filename: string): Promise<{ width: number, height:
                 })
             });
         } catch (error) {
-            reject({...error as any, filename});
+            reject({ ...error as any, filename });
+        }
+    });
+}
+
+export const getExifData = (filename: string): Promise<{ [key: string]: string } | FileError> => {
+    return new Promise((resolve, reject) => {
+        try {
+            exec(`exiftool -a -G1 "${filename}"`, (error, stdout, stderr) => {
+                if (error || stderr) {
+                    reject({ ...error, stderr })
+                }
+                let o: { [key: string]: string } = {}
+                let lines = stdout.split("\n")
+                for (let x in lines) {
+                    let l = lines[x]
+                    let v = l.split(':', 2);
+                    if (v.length >= 2) {
+                        let vari = v[0].trim();
+                        let ans = v[1].trim();
+                        o[vari.toString()] = ans;
+                    }
+                }
+                resolve(o);
+            })
+        } catch (error) {
+            reject(new FileError("103", filename, JSON.stringify(error)));
         }
     });
 }

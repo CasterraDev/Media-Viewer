@@ -5,17 +5,17 @@ import { NextRequest, NextResponse } from 'next/server';
 import path from 'path';
 import { fileTypeFromFile } from 'file-type'
 import { imageSizeFromFile } from 'image-size/fromFile'
-import { getType, getVideoData } from '@/utils/util';
+import { getExifData, getType, getVideoData } from '@/utils/util';
 import { MediaType } from '@/_types/type';
 import { eq } from 'drizzle-orm';
 import { FileError } from '@/errors/Files';
 
 type FileErrorReason = { file: string, reason: string }
-type PromiseReturn = { newFiles: string[], rejectedFiles: FileErrorReason[], errorFiles: FileErrorReason[] }
+type PromiseReturn = { newFiles: string[], newFilesCount: number, rejectedFiles: FileErrorReason[], errorFiles: FileErrorReason[] }
 
 const uploadFiles = async (filepath: string, mediaRoot: string): Promise<PromiseReturn> => {
     return new Promise(async (resolve, _reject) => {
-        let pf: PromiseReturn = { newFiles: [], rejectedFiles: [], errorFiles: [] }
+        let pf: PromiseReturn = { newFiles: [], newFilesCount: 0, rejectedFiles: [], errorFiles: [] }
         let mimeType: string | undefined = undefined;
         let files = await readdir(filepath)
 
@@ -93,23 +93,36 @@ const uploadFiles = async (filepath: string, mediaRoot: string): Promise<Promise
                     if (duration) {
                         m.mediaDurationInSecs = duration;
                     }
+                    let ex = await getExifData(filename);
+                    // if (ex['[XMP-photoshop] Category']){
+                    if (!(ex instanceof Error)) {
+                        if (ex['[XMP-dc]        Title']) {
+                            m.title = ex['[XMP-dc]        Title']
+                        }
+                        if (ex['[XMP-dc]        Description']) {
+                            m.description = ex['[XMP-dc]        Description']
+                        }
+                    }
 
                     await db.insert(media).values(m).then(() => {
-                        pf.newFiles.push(root + dir + name);
+                        // pf.newFiles.push(root + dir + name);
+                        pf.newFilesCount++;
                     })
                 }
             } catch (error: unknown) {
                 // console.log(JSON.stringify(error))
                 // isUniqueConstraintError
                 if ((error as any)?.cause?.code === '23505') {
+                    console.error(error);
                     pf.rejectedFiles.push({ file: root + dir + name, reason: "isUniqueConstraintError" });
                     // console.log(`isUniqueConstraintError Occurred: ${error} File: ${file} MT: ${mimeType}`)
                 } else if (error instanceof FileError) {
+                    console.error(error);
                     pf.errorFiles.push({ file: root + dir + name, reason: error.cause });
                     // console.log(`Error Occurred: ${error} File: ${file} MT: ${mimeType}`)
                     // console.log((error as any).cause.code)
-                }else{
-                    console.log(error);
+                } else {
+                    console.error(error);
                 }
             }
         }
@@ -125,7 +138,7 @@ export async function POST(
         const mediaRoots: string[] | null = body.mediaRoots;
         if (!mediaRoots) throw new Error("No media roots passed.")
 
-        let pf: PromiseReturn = { newFiles: [], rejectedFiles: [], errorFiles: [] }
+        let pf: PromiseReturn = { newFiles: [], newFilesCount: 0, rejectedFiles: [], errorFiles: [] }
         for (let x in mediaRoots) {
             let m = mediaRoots[x]
             let y = await uploadFiles(m, m);
