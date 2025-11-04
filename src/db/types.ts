@@ -1,4 +1,3 @@
-import { InferSelectModel } from "drizzle-orm";
 import * as schema from "./schema"
 import {
     type BuildQueryResult,
@@ -15,12 +14,13 @@ export type AlbumInsert = typeof schema.album.$inferInsert;
 export type MediaToAlbums = typeof schema.mediasToAlbums.$inferSelect;
 export type MediaToAlbumsInsert = typeof schema.mediasToAlbums.$inferInsert;
 
-export type MediaAlbums = InferQueryModel<"media", {with: {albums: {with:{album:true}}}}>
+export type MediaAll = InferQueryModel<"media", { with: { albums: { with: { album: true } } } }>
+export type MediaAlbums = InferQueryModel<"media", { with: { albums: { with: { album: true } } } }>
 
 type TSchema = ExtractTablesWithRelations<typeof schema>;
 
-export type QueryConfig<TableName extends keyof TSchema> = 
-  DBQueryConfig<"one" | "many", boolean, TSchema, TSchema[TableName]>;
+export type QueryConfig<TableName extends keyof TSchema> =
+    DBQueryConfig<"one" | "many", boolean, TSchema, TSchema[TableName]>;
 
 
 /* EXAMPLE
@@ -39,8 +39,8 @@ type Result = InferQueryModel<
 type Result = { id: string; character: { id: string; } }
 */
 export type InferQueryModel<
-  TableName extends keyof TSchema, 
-  QBConfig extends QueryConfig<TableName> = {}
+    TableName extends keyof TSchema,
+    QBConfig extends QueryConfig<TableName> = {}
 > = BuildQueryResult<
     TSchema,
     TSchema[TableName],

@@ -1,6 +1,7 @@
 import { db } from '@/db';
 import { media, mediasToAlbums } from '@/db/schema';
-import { and, AnyColumn, asc, desc, eq, gt, ilike, inArray, lt, or, sql, SQLWrapper } from 'drizzle-orm';
+import { MediaAll } from '@/db/types';
+import { and, AnyColumn, asc, desc, gt, ilike, inArray, lt, or, sql, SQLWrapper } from 'drizzle-orm';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(
@@ -40,7 +41,7 @@ export async function GET(
         // search through albumsParam seperate into 2 arrs, 1 ids, 1 titles
         // then make the below VVV albumsParam line into an or() with the two arrays
 
-        const medias = await db.query.media.findMany({
+        const medias: MediaAll[] = await db.query.media.findMany({
             where: and(
                 mediaTypesParam.length > 0 ? inArray(media.mediaType, mediaTypesParam) : undefined,
                 albumsParam.length > 0 ? inArray(media.id,

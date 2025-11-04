@@ -22,7 +22,7 @@ export default function Topbar() {
                 </SheetTrigger>
                 <SheetContent side="left" className="w-fit p-5 gap-3">
                     <SheetHeader className="py-1 mt-3">
-                        <SheetTitle>Where to go</SheetTitle>
+                        <SheetTitle>Where to Not have go</SheetTitle>
                     </SheetHeader>
                     <hr />
                     <div className="grid flex-1 auto-rows-min gap-3 px-4 *:text-[var(--color-foreground)] *:font-bold *:uppercase">

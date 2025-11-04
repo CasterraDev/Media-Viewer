@@ -1,11 +1,9 @@
-import Settings from "@/components/Settings"
+import Settings from "@/app/settings/Settings"
 
 export default function page() {
 
     return (
-        <div>
-            <Settings />
-        </div>
+        <Settings />
     )
 }
 

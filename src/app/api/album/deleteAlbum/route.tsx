@@ -16,7 +16,7 @@ export async function POST(
         return NextResponse.json({result: res}, { status: 200 });
     } catch (err: unknown) {
         console.error(`Error processing request:`);
-        console.error(err)
-        return new Response(`Internal server error: ${err}`, { status: 500 });
+        console.error(err);
+        return new Response(`Internal server error: ${JSON.stringify(err)}`, { status: 500 });
     }
 }

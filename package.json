@@ -7,8 +7,6 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "dev:up": "docker-compose -f docker-compose.yml up",
-    "prod:up": "docker-compose -f docker-compose.prod.yml up",
     "db:push": "drizzle-kit push",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",

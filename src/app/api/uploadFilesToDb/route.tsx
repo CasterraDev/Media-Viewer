@@ -9,6 +9,7 @@ import { getExifData, getType, getVideoData } from '@/utils/util';
 import { MediaType } from '@/_types/type';
 import { eq } from 'drizzle-orm';
 import { FileError } from '@/errors/Files';
+import { env } from 'process';
 
 type FileErrorReason = { file: string, reason: string }
 type PromiseReturn = { newFiles: string[], newFilesCount: number, rejectedFiles: FileErrorReason[], errorFiles: FileErrorReason[] }
@@ -110,17 +111,12 @@ const uploadFiles = async (filepath: string, mediaRoot: string): Promise<Promise
                     })
                 }
             } catch (error: unknown) {
-                // console.log(JSON.stringify(error))
-                // isUniqueConstraintError
                 if ((error as any)?.cause?.code === '23505') {
                     console.error(error);
                     pf.rejectedFiles.push({ file: root + dir + name, reason: "isUniqueConstraintError" });
-                    // console.log(`isUniqueConstraintError Occurred: ${error} File: ${file} MT: ${mimeType}`)
                 } else if (error instanceof FileError) {
                     console.error(error);
                     pf.errorFiles.push({ file: root + dir + name, reason: error.cause });
-                    // console.log(`Error Occurred: ${error} File: ${file} MT: ${mimeType}`)
-                    // console.log((error as any).cause.code)
                 } else {
                     console.error(error);
                 }
@@ -134,6 +130,7 @@ export async function POST(
     req: NextRequest,
 ) {
     try {
+        console.log(process.cwd())
         const body = await req.json()
         const mediaRoots: string[] | null = body.mediaRoots;
         if (!mediaRoots) throw new Error("No media roots passed.")

@@ -6,8 +6,8 @@ import useUserPrefs from "@/hooks/useUserPrefs"
 import { XIcon } from "lucide-react";
 import { FaChevronUp, FaChevronDown } from "react-icons/fa";
 import { FormEvent, useEffect, useRef, useState } from "react";
-import UploadBtn from "./UploadBtn";
-import DataChanger from "./DataChanger";
+import UploadBtn from "@/components/UploadBtn";
+import DataChanger from "@/components/DataChanger";
 
 export default function Settings() {
     const [roots, setRoots] = useState<string[]>([])

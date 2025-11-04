@@ -1,3 +1,4 @@
+import { db } from "@/db"
 import { Signal } from "@preact/signals-react"
 
 export type FileData = {

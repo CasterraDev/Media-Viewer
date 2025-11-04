@@ -12,25 +12,25 @@ export async function GET(
         const withMedias = req.nextUrl.searchParams.get("withMedias")?.toString();
 
         if (!albumID) throw new Error("Failed to get album");
-        let a;
 
         let p: Parameters<typeof db['query']['album']['findFirst']>[0] = {
             where: eq(album.id, albumID),
         }
 
-        if (withThumbanil == "true" && withMedias == "true"){
-            p.with = {thumbnail: true, medias: {with:{media: true}}}
-        }else if (withThumbanil == "true"){
-            p.with = {thumbnail: true}
-        }else if (withMedias == "true"){
-            p.with = {medias: {with:{media: true}}}
+        if (withThumbanil == "true" && withMedias == "true") {
+            p.with = { thumbnail: true, medias: { with: { media: true } } }
+        } else if (withThumbanil == "true") {
+            p.with = { thumbnail: true }
+        } else if (withMedias == "true") {
+            p.with = { medias: { with: { media: true } } }
         }
 
-        a = await db.query.album.findFirst(p)
+        let a = await db.query.album.findFirst(p)
 
         return NextResponse.json(a, { status: 200 });
     } catch (err: unknown) {
-        console.error(`Error processing request: ${err}`);
-        return new Response(`Internal server error: ${err}`, { status: 500 });
+        console.error(`Error processing request:`);
+        console.error(err);
+        return new Response(`Internal server error: ${JSON.stringify(err)}`, { status: 500 });
     }
 }

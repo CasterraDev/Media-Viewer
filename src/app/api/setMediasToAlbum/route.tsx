@@ -1,7 +1,6 @@
 import { db } from '@/db';
-import { album, media, mediasToAlbums } from '@/db/schema';
+import { mediasToAlbums } from '@/db/schema';
 import { NextRequest, NextResponse } from 'next/server';
-import { inArray } from 'drizzle-orm';
 
 export async function POST(
     req: NextRequest,
@@ -10,20 +9,25 @@ export async function POST(
         const body = await req.json()
         let res;
 
-        if (!(!body.mediaIDs || body.mediaIDs.length == 0)) {
-            const mar: any[] = body.mediaIDs.map((x: string) => ({
-                mediaID: x,
-                albumID: body.albumID
-            }))
+        if (!body.albumID) {
+            throw new Error("No album ID given")
+        }
 
-            res = await db.insert(mediasToAlbums).values(mar)
-        } else {
+        if (!body.mediaIDs || body.mediaIDs.length == 0) {
             throw new Error("No media IDs given")
         }
 
+        const mar = body.mediaIDs.map((x: string) => ({
+            mediaID: x,
+            albumID: body.albumID
+        }))
+
+        res = await db.insert(mediasToAlbums).values(mar)
+
         return NextResponse.json({ res }, { status: 200 });
     } catch (err: unknown) {
-        console.error(`Error processing request: ${err}`);
-        return new Response(`Internal server error: ${err}`, { status: 500 });
+        console.error(`Error processing request:`);
+        console.error(err);
+        return new Response(`Internal server error: ${JSON.stringify(err)}`, { status: 500 });
     }
 }

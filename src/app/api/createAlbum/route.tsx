@@ -10,7 +10,7 @@ export async function POST(
     try {
         const body: CreateAlbumAPIPOST = await req.json()
 
-        await db.transaction(async (tx) => {
+        await db.transaction(async (_tx) => {
             const al = await db.insert(album).values({
                 title: body.title || null,
                 description: body.description || null,
@@ -32,7 +32,8 @@ export async function POST(
         })
         return NextResponse.json({}, { status: 200 });
     } catch (err: unknown) {
-        console.error(`Error processing request: ${err}`);
-        return new Response(`Internal server error: ${err}`, { status: 500 });
+        console.error(`Error processing request:`);
+        console.error(err);
+        return new Response(`Internal server error: ${JSON.stringify(err)}`, { status: 500 });
     }
 }

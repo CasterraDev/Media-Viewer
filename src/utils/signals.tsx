@@ -1,8 +1,7 @@
-import { Filter, MediaTypes } from '@/_types/type'
-import { Media, MediaAlbums } from '@/db/types'
+import { Filter } from '@/_types/type'
+import { MediaAlbums } from '@/db/types'
 import { Signal, signal } from '@preact/signals-react'
 
-export let refreshMediaList: Signal<number> = signal(0)
 export let mediaList: Signal<MediaAlbums[]> = signal([])
 export let mediaSelectList: Signal<MediaAlbums[]> = signal([])
 export let mediaNotFinished: Signal<boolean> = signal(true)

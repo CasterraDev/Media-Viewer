@@ -1,17 +1,48 @@
-version: "3.9"
 services:
-  image-viewer-db:
-    image: postgres
+  dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: ${DB_CONTAINER_NAME}-nextjs-dev
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+      - /home/cas:/home/cas
+      - /mnt:/mnt
+    ports:
+      - ${APP_PORT}:${APP_PORT}
+    env_file:
+      - .env
+    environment:
+      - WATCHPACK_POLLING=true
+      - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@${DB_CONTAINER_NAME}-db:5432
+    depends_on:
+      - db
+  prod:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    container_name: ${DB_CONTAINER_NAME}-nextjs
+    ports:
+      - ${APP_PORT}:${APP_PORT}
+    env_file:
+      - .env
+    environment:
+      - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@${DB_CONTAINER_NAME}-db:5432
+    depends_on:
+      - db
+  db:
+    image: postgres:17
     restart: always
-    container_name: image-viewer-db
+    container_name: ${DB_CONTAINER_NAME}-db
     ports:
       - 5432:5432
     environment:
-      POSTGRES_PASSWORD: postgres
-      DATABASE_URL: ${DATABASE_URL}
-      PGDATA: /data/postgres
+      - PGDATA=/data/postgres
+      - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@${APP_DOMAIN}:5432
     volumes:
       - postgres:/data/postgres
 volumes:
   postgres:
-
+  node_modules:
